@@ -1,0 +1,26 @@
+SetCellsize(4e-9, 4e-9, 4e-9)
+SetGridsize(16, 16, 1)
+
+msat  = 800e3
+aex   = 13e-12
+alpha = 0.01
+b_ext = vector(0, 0.01, 0)
+m     = uniform(1, 0, 0)
+
+
+// vary grid sizes
+for n:=16; n<=1024; n++{
+    SetGridsize(n, n, 1)
+    N2 := n*n
+    steps(1) // warm-up kernel
+
+    t = 0
+    start := now()
+    neval0 := NEval
+
+    steps(100)
+
+    wall := since(start).Seconds() 
+    nevl := NEval - neval0
+    fprintln("benchmark.txt", N2, N2*nevl/wall, t/nevl)
+}
