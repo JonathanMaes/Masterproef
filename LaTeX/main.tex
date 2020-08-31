@@ -1,0 +1,79 @@
+\documentclass[10pt,a4paper]{article}
+
+%% PACKAGES WITH OPTIONS
+\usepackage[english]{babel}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[version=4]{mhchem} % Chemistry and isotopes with \ce{} (other option: 'chemformula' \ch{})
+\usepackage[numbers]{natbib} % numbers: needed argument, otherwise error
+\usepackage[section]{placeins} % Place floats in their own section
+\usepackage[nottoc,notlot,notlof]{tocbibind} % Include bibliography in table of contents
+
+%% PACKAGES WITHOUT OPTIONS
+\usepackage{amsmath, amsfonts, amssymb}
+\usepackage{enumitem} % Lists
+\usepackage{flafter} % Place floats after their first appearance in text
+\usepackage{float} % [H] modifier for floats etc.
+\usepackage{graphicx}
+\usepackage{hyperref, cleveref} % Creates links (boxes in various colors around words)
+\usepackage{indentfirst} % Always indent the first line of a section
+\usepackage{listings} % Typesetting source code
+\usepackage{physics} % Vector calculus etc.
+\usepackage{siunitx} % Fancy display of SI units
+\usepackage{subcaption} % Enables subfigures
+\usepackage{titling}
+\usepackage{xcolor} % Anything with color e.g. \fcolorbox{black}{red}{}
+\usepackage{xurl} % Loads package 'url' and breaks urls nicely
+
+%% PACKAGES SETUP COMMANDS
+\hypersetup{colorlinks=true,urlcolor=blue}
+
+%% COMMANDS
+% Bold and italic vector symbols (preferably use \vb{} instead)
+\renewcommand{\vec}[1]{\boldsymbol{#1}}
+% Monospaced inline code (for multiline code, use package 'listings')
+\newcommand{\code}[1]{\texttt{#1}}
+% Equals sign, with number above referencing some equation
+\newcommand{\numeq}[1]{\stackrel{\scriptscriptstyle(\mkern-1.5mu#1\mkern-1.5mu)}{=}}
+% If-and-only-if sign, with number above referencing some equation
+\newcommand{\numiff}[1]{\stackrel{\scriptscriptstyle(\mkern-1.5mu#1\mkern-1.5mu)}{\Leftrightarrow}}
+% Numbers a single line in a no-numbering multiline equation* or align*
+\newcommand{\numberthis}{\addtocounter{equation}{1}\tag{\theequation}}
+
+%% TITLE VARIABLES
+\author{Jonathan Maes}
+\title{Biaxial nanomagnets as building block for balanced half-adders}
+
+
+\begin{document}
+	\begin{titlingpage}
+	\maketitle
+	\end{titlingpage}
+
+	\pagenumbering{roman}
+	\newpage
+	
+	\tableofcontents
+	\pagenumbering{arabic}
+	\newpage
+
+	\section{Introduction}
+	Probably MuMax3 will be used.~\cite{MuMax3}
+	An interesting source is~\cite{NML_Carlton}.
+	
+	\section{Physics}
+	\subsection{Landau-Lifschitz-Gilbert equation}
+	\subsection{Energy contributions}
+	\subsubsection{Exchange energy}
+	Tries to align neighboring spins:
+	$E_{i,j} = -J \vb{S_i} \vdot \vb{S_j}$
+	\subsubsection{Magnetostatic energy/Demagnetization energy}
+	
+	\subsubsection{Zeeman energy}
+	$E = -\mu_0 \vb{M} \cdot \vb{H_{ext}}$
+	
+	
+	\newpage
+	\bibliographystyle{IEEEtran}
+	\bibliography{bibliography/bibliography.bib}
+\end{document}
