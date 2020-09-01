@@ -1,1 +1,5 @@
 Literatuur/
+# Exclude all .out directories, unless they contain .ovf or table.txt
+inputfiles/**/*.out/*
+!inputfiles/**/*.out/*.ovf
+!inputfiles/**/*.out/table.txt
