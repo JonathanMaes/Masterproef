@@ -3,3 +3,4 @@ Literatuur/
 inputfiles/**/*.out/*
 !inputfiles/**/*.out/*.ovf
 !inputfiles/**/*.out/table.txt
+inputfiles/test
