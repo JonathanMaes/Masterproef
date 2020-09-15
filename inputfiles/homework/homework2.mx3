@@ -1,0 +1,59 @@
+//// SET GRID
+Nx := 256
+Ny := 64
+Nz := 1
+SetGridsize(Nx, Ny, Nz)
+SetCellsize(1e-9, 1e-9, 1e-9)
+SetPbc(4,0,0)
+
+//// SET MUMAX PARAMETERS
+Msat  = 580e3
+Aex   = 15e-12
+Dind = 3e-3
+Ku1 = 0.8e6
+AnisU = vector(0,0,1)
+alpha = 0.1
+print("Exchange length:", Sqrt((2*Aex.GetRegion(0))/(mu0*Pow(Msat.GetRegion(0), 2))))
+
+Pol = 0.4
+xi = 0.2
+
+//// CENTER REGION
+regionShape := Rect(32e-9, 64e-9)
+DefRegion(1, regionShape)
+Ku1.setRegion(1, Ku1.getRegion(0)*1.05)
+
+//// TABLE
+TableAdd(j)
+TableAdd(ext_bubblepos)
+
+//// LOOP THROUGH CURRENT DENSITIES
+jx_min := 7.10e11
+jx_max := 7.11e11
+jx_step := 1e9
+for jx := jx_min; jx <= jx_max; jx += jx_step {
+    //// REMOVE CURRENT DENSITY FOR minmize() FUNCTION
+    j = vector(0,0,0)
+
+    //// INITIAL MAGNETISATION
+    m = neelskyrmion(-1, 1).transl(-40e-9, 0, 0)
+    minimize()
+
+    //// CURRENT DENSITY
+    j = vector(-jx,0,0)
+
+    //// SET OUTPUT
+    //AutoSave(m, 4e-10)
+    TableAutoSave(1e-11)
+
+    //// RUN
+    runtime := 3e-9*(1e12/jx) // Scale inversely with current density
+    print(sprintf("Runtime: %e", runtime))
+    run(runtime)
+
+    if ext_bubblepos.Get().X() >= 0 {
+        print(sprintf("J=%e: barrier lets skyrion pass", jx))
+    } else {
+        print(sprintf("J=%e: barrier does not let skyrion pass", jx))
+    }
+}
