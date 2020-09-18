@@ -21,16 +21,16 @@ TableAddVar(L, "L", "m")
 ////////////////
 for L=Lmin; L<=Lmax; L+=Lstep {
     //// SET CELL SIZE
-    size := L
-    SetCellsize(size/N, size/N, size/N)
-    print("Cell size:", size/N)
+    sz := L
+    SetCellsize(sz/N, sz/N, sz/N)
+    print("Cell size:", sz/N)
 
     //// CREATE GEOMETRY AT CORRECT SCALE
     geometry := Universe().Inverse()
-    for i:=0; i<size/sliceHeight; i++ {
+    for i:=0; i<sz/sliceHeight; i++ {
         sizeNow := Max((L/Sqrt(2) - sliceHeight*i)*Sqrt(2), 0)
         square := Square(sizeNow)
-        movedSquare := square.Intersect(ZRange(i*sliceHeight-size/2, (i+1)*sliceHeight-size/2))
+        movedSquare := square.Intersect(ZRange(i*sliceHeight-sz/2, (i+1)*sliceHeight-sz/2))
         geometry = geometry.Add(movedSquare)
     }
     SetGeom(geometry)
