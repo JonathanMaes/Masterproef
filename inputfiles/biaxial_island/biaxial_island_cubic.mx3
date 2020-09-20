@@ -1,0 +1,30 @@
+//// Grid
+Nxy := 128
+Nz := 1
+SetGridSize(Nxy, Nxy, Nz)
+SetCellSize(1e-9, 1e-9, 5e-9/Nz)
+
+//// Material parameters
+Msat = 800e3
+Aex = 13e-12
+Kc1 = 1000
+Kc2 = 1000
+anisC1 = Vector(1,0,0)
+anisC2 = Vector(0,1,0)
+print("Exchange length:", Sqrt((2*Aex.GetRegion(0))/(mu0*Pow(Msat.GetRegion(0), 2)))) // 5.6858e-9 so ok to use Nz = 1 for 5e-9 thickness
+
+//// Shape
+geometry := Circle(100e-9)
+SetGeom(geometry)
+
+//// Track E_total and angle
+TableAdd(E_total)
+angle := 0.0
+TableAddVar(angle, "Angle", "rad")
+
+//// Sweep magnetization
+for angle=0.0; angle < 2*Pi; angle = angle + 0.01 {
+    m = Uniform(cos(angle),sin(angle),0)
+    Run(0)
+    TableSave()
+}

@@ -1,0 +1,41 @@
+//mumax 3.10 [windows_amd64 go1.11.6(gc) CUDA-11.0]
+//GPU info: GeForce MX150(2048MB), CUDA Driver 11.0, cc=6.1, using cc=61 PTX
+//(c) Arne Vansteenkiste, Dynamat LAB, Ghent University, Belgium
+//This is free software without any warranty. See license.txt
+//********************************************************************//
+//  If you use mumax in any work or publication,                      //
+//  we kindly ask you to cite the references in references.bib        //
+//********************************************************************//
+//output directory: c:\Jonathan\UGent\Masterproef\inputfiles\biaxial_island\biaxial_island_shape.out/
+Nxy := 128
+Nz := 1
+SetGridSize(Nxy, Nxy, Nz)
+SetCellSize(1e-9, 1e-9, 5e-9/Nz)
+Msat = 800e3
+Aex = 13e-12
+print("Exchange length:", Sqrt((2*Aex.GetRegion(0))/(mu0*Pow(Msat.GetRegion(0), 2))))
+//Exchange length: 5.685802385313737e-09
+TableAdd(E_total)
+angle := 0.0
+length := 90
+TableAddVar(angle, "Angle", "rad")
+TableAddVar(length, "Length", "nm")
+for length = 100; length >= 70; length -= 10 {
+	print(sprintf("Short axis: %d nm", length))
+	geometry := Square(length * 1e-9)
+	SetGeom(geometry)
+	for angle = 0.0; angle < 2*Pi; angle += 0.01 {
+		m = Uniform(cos(angle), sin(angle), 0)
+		Run(0)
+		TableSave()
+	}
+}
+//Short axis: 100 nm
+//Short axis: 90 nm
+//Short axis: 80 nm
+//Short axis: 70 nm
+//********************************************************************//
+//Please cite the following references, relevant for your simulation. //
+//See bibtex file in output folder for justification.                 //
+//********************************************************************//
+//   * Vansteenkiste et al., AIP Adv. 4, 107133 (2014).
