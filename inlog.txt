@@ -1,0 +1,13 @@
+Open 1e bitvise, met server:
+ dynamag.ugent.be
+ 22
+en 'Log in'.
+
+Open 2e bitvise, met server:
+ localhost
+ 7777
+en 'Log in'.
+In 2e bitvise, open terminal en SFTP venster.
+
+SFTP venster: om bestanden te bekijken op remote server
+Terminal: om mumax3 uit te voeren (! is Linux server !)
