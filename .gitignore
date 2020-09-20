@@ -1,9 +1,7 @@
 Literatuur/
 LaTeX/
 # Exclude all .out directories, unless they contain .ovf or .txt
-# log.txt is excluded anyway, but all other .txt will get included.
 inputfiles/**/*.out/*
 !inputfiles/**/*.out/*.ovf
 !inputfiles/**/*.out/*.txt
-inputfiles/**/*.out/log.txt
 inputfiles/test

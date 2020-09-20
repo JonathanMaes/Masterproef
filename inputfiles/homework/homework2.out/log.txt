@@ -1,0 +1,60 @@
+//mumax 3.10 [windows_amd64 go1.11.6(gc) CUDA-11.0]
+//GPU info: GeForce MX150(2048MB), CUDA Driver 11.0, cc=6.1, using cc=61 PTX
+//(c) Arne Vansteenkiste, Dynamat LAB, Ghent University, Belgium
+//This is free software without any warranty. See license.txt
+//********************************************************************//
+//  If you use mumax in any work or publication,                      //
+//  we kindly ask you to cite the references in references.bib        //
+//********************************************************************//
+//output directory: homework2.out/
+Nx := 256
+Ny := 64
+Nz := 1
+SetGridsize(Nx, Ny, Nz)
+SetCellsize(1e-9, 1e-9, 1e-9)
+SetPbc(4, 0, 0)
+//resizing...
+Msat = 580e3
+Aex = 15e-12
+Dind = 3e-3
+Ku1 = 0.8e6
+AnisU = vector(0, 0, 1)
+alpha = 0.1
+print("Exchange length:", Sqrt((2*Aex.GetRegion(0))/(mu0*Pow(Msat.GetRegion(0), 2))))
+//Exchange length: 8.424181101094624e-09
+Pol = 0.4
+xi = 0.2
+regionShape := Rect(32e-9, 64e-9)
+DefRegion(1, regionShape)
+Ku1.setRegion(1, Ku1.getRegion(0)*1.05)
+TableAdd(j)
+TableAdd(ext_bubblepos)
+jx_min := 7.10e11
+jx_max := 7.11e11
+jx_step := 1e9
+for jx := jx_min; jx <= jx_max; jx += jx_step {
+	j = vector(0, 0, 0)
+	m = neelskyrmion(-1, 1).transl(-40e-9, 0, 0)
+	minimize()
+	j = vector(-jx, 0, 0)
+	TableAutoSave(1e-11)
+	runtime := 3e-9 * (1e12 / jx)
+	print(sprintf("Runtime: %e", runtime))
+	run(runtime)
+	if ext_bubblepos.Get().X() >= 0 {
+		print(sprintf("J=%e: barrier lets skyrion pass", jx))
+	} else {
+		print(sprintf("J=%e: barrier does not let skyrion pass", jx))
+	}
+}
+//Runtime: 4.225352e-09
+//J=7.100000e+11: barrier does not let skyrion pass
+//Runtime: 4.219409e-09
+//J=7.110000e+11: barrier lets skyrion pass
+//********************************************************************//
+//Please cite the following references, relevant for your simulation. //
+//See bibtex file in output folder for justification.                 //
+//********************************************************************//
+//   * Vansteenkiste et al., AIP Adv. 4, 107133 (2014).
+//   * Exl et al., J. Appl. Phys. 115, 17D118 (2014).
+//   * Mulkers et al., Phys. Rev. B 95, 144401 (2017).
