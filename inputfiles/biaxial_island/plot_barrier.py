@@ -18,7 +18,7 @@ if __name__ == "__main__":
     plt.plot(cubic["Angle"], cubic["E_total"])
 
     # Shape anisotropy: Plus
-    shape = read_mumax3_table('biaxial_island_shape.out/tablePlus_70-100_0.03step.txt')
+    shape = read_mumax3_table('biaxial_island_shape.out/tablePlus_10-100_a0.1_l5.txt')
     for subset in shape.groupby("Length"):
         size = subset[0]
         subtable = subset[1]
