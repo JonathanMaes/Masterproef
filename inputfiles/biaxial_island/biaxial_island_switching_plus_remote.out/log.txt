@@ -1,0 +1,44 @@
+//mumax 3.10 linux_amd64 go1.11.1 (gc)
+//CUDA 10000 GeForce GTX 1080(8117MB) cc6.1 , using CC 61  PTX
+//(c) Arne Vansteenkiste, Dynamat LAB, Ghent University, Belgium
+//This is free software without any warranty. See license.txt
+//********************************************************************//
+//  If you use mumax in any work or publication,                      //
+//  we kindly ask you to cite the references in references.bib        //
+//********************************************************************//
+//output directory: biaxial_island_switching_plus.out/
+Nxy := 32
+Nz := 1
+SetGridSize(Nxy, Nxy, Nz)
+SetCellSize(4e-9, 4e-9, 5e-9/Nz)
+Msat = 800e3
+Aex = 13e-12
+print("Exchange length:", Sqrt((2*Aex.GetRegion(0))/(mu0*Pow(Msat.GetRegion(0), 2))))
+//Exchange length: 5.685802385313737e-09
+TableAdd(E_total)
+TableAdd(E_zeeman)
+length := 90
+TableAddVar(length, "Length", "nm")
+TableAutoSave(1e-11)
+AutoSave(m, 1e-9)
+alpha = 0.1
+Temp = 300
+Thermseed(12345)
+setsolver(5)
+fixdt = 0
+m = Uniform(1, 0, 0)
+for length = 65; length >= 65; length -= 10 {
+	print(sprintf("Short axis: %d nm", length))
+	geometry := Ellipse(100e-9, length*1e-9)
+	geometry = geometry.Add(geometry.RotZ(Pi / 2))
+	SetGeom(geometry)
+	relax()
+	Run(1e-6)
+}
+//Short axis: 65 nm
+//********************************************************************//
+//Please cite the following references, relevant for your simulation: //
+//See bibtex file in output folder for justification.                 //
+//********************************************************************//
+//   * Vansteenkiste et al., AIP Adv. 4, 107133 (2014).
+//   * Leliaert et al., AIP Adv. 7, 125010 (2017).
