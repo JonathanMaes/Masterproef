@@ -16,26 +16,56 @@ Aex = 13e-12
 print("Exchange length:", Sqrt((2*Aex.GetRegion(0))/(mu0*Pow(Msat.GetRegion(0), 2))))
 //Exchange length: 5.685802385313737e-09
 TableAdd(E_total)
+TableAdd(E_zeeman)
 angle := 0.0
-length := 90
+length := 90.
 TableAddVar(angle, "Angle", "rad")
 TableAddVar(length, "Length", "nm")
-for length = 100; length >= 70; length -= 10 {
-	print(sprintf("Short axis: %d nm", length))
-	geometry := Square(length * 1e-9)
+for length = 45.; length >= 42.; length -= 0.1 {
+	print(sprintf("Short axis: %.1f nm", length))
+	geometry := Ellipse(100e-9, length*1e-9)
+	geometry = geometry.Add(geometry.RotZ(Pi / 2))
 	SetGeom(geometry)
-	for angle = 0.0; angle < 2*Pi; angle += 0.01 {
+	for angle = 0.0; angle < 2*Pi; angle += 0.1 {
 		m = Uniform(cos(angle), sin(angle), 0)
-		Run(0)
+		B_ext = vector(5*cos(angle), 5*sin(angle), 0)
+		minimize()
 		TableSave()
 	}
 }
-//Short axis: 100 nm
-//Short axis: 90 nm
-//Short axis: 80 nm
-//Short axis: 70 nm
+//Short axis: 45.0 nm
+//Short axis: 44.9 nm
+//Short axis: 44.8 nm
+//Short axis: 44.7 nm
+//Short axis: 44.6 nm
+//Short axis: 44.5 nm
+//Short axis: 44.4 nm
+//Short axis: 44.3 nm
+//Short axis: 44.2 nm
+//Short axis: 44.1 nm
+//Short axis: 44.0 nm
+//Short axis: 43.9 nm
+//Short axis: 43.8 nm
+//Short axis: 43.7 nm
+//Short axis: 43.6 nm
+//Short axis: 43.5 nm
+//Short axis: 43.4 nm
+//Short axis: 43.3 nm
+//Short axis: 43.2 nm
+//Short axis: 43.1 nm
+//Short axis: 43.0 nm
+//Short axis: 42.9 nm
+//Short axis: 42.8 nm
+//Short axis: 42.7 nm
+//Short axis: 42.6 nm
+//Short axis: 42.5 nm
+//Short axis: 42.4 nm
+//Short axis: 42.3 nm
+//Short axis: 42.2 nm
+//Short axis: 42.1 nm
 //********************************************************************//
 //Please cite the following references, relevant for your simulation. //
 //See bibtex file in output folder for justification.                 //
 //********************************************************************//
 //   * Vansteenkiste et al., AIP Adv. 4, 107133 (2014).
+//   * Exl et al., J. Appl. Phys. 115, 17D118 (2014).
