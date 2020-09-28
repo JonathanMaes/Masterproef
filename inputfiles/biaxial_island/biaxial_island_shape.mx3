@@ -11,25 +11,27 @@ print("Exchange length:", Sqrt((2*Aex.GetRegion(0))/(mu0*Pow(Msat.GetRegion(0), 
 
 //// Track E_total, angle, shape
 TableAdd(E_total)
+TableAdd(E_zeeman)
 angle := 0.0
-length := 90
+length := 100
 TableAddVar(angle, "Angle", "rad")
 TableAddVar(length, "Length", "nm")
-for length=100; length >= 70; length -= 10 {
+for length=100; length >= 10; length -= 10 {
     print(sprintf("Short axis: %d nm", length))
 
     //// Shape
-    geometry := Square(length*1e-9)
-    //geometry = geometry.Add(geometry.RotZ(Pi/2))
+    geometry := Ellipse(100e-9, length*1e-9)
+    geometry = geometry.Add(geometry.RotZ(Pi/2))
     SetGeom(geometry)
-    //SaveAs(geom, sprintf("geomEllipse%d", length))
+    //SaveAs(geom, sprintf("geomPlus%d", length))
 
     //// Sweep magnetization
-    for angle=0.0; angle < 2*Pi; angle += 0.01 {
-        m = Uniform(cos(angle),sin(angle),0)
-        //m.setInShape(geometry, Uniform(cos(angle),sin(angle),0))
-        Run(0)
+    for angle=0.0; angle < 2*Pi; angle += 0.1 {
+        m = Uniform(cos(angle), sin(angle), 0)
+		B_ext = vector(5*cos(angle), 5*sin(angle), 0)
+		minimize()
+        
         TableSave()
-        //SaveAs(m, sprintf("mEllipse_l%d_a%.2f.ovf", length, angle))
+        //SaveAs(m, sprintf("mPlus_l%d_a%.2f.ovf", length, angle))
     }
 }
