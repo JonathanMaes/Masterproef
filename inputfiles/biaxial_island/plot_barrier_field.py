@@ -20,9 +20,19 @@ if __name__ == "__main__":
         subtable = subset[1]
         E_demag = subtable["E_total"]-subtable["E_Zeeman"]
         diff = max(E_demag) - min(E_demag)
-        print("(%.2f nm) Delta E: %.2e J = %.3f eV" % (field, diff, diff/1.602e-19))
+        print("(%.2f T) Delta E: %.2e J = %.3f eV" % (field, diff, diff/1.602e-19))
         legend.append('%.2f T' % field)
-        plt.plot(subtable["Angle"], E_demag)
+
+        angles = np.arctan2(subtable["my"], subtable["mx"])*180/np.pi
+        if 1: # Plot angles successively (180 -> 181 instead of 180 -> -179)
+            previousAngles = np.array(angles)[:-1]
+            nextAngles = np.array(angles)[1:]
+            offsets = (np.abs(previousAngles - nextAngles) > 180)*((previousAngles > nextAngles)*2 - 1)*360
+            offset = np.cumsum(offsets)
+            fancyAngles = np.append([angles.iloc[0]], angles.iloc[1:] + offset)
+            angles = fancyAngles
+        plt.plot(angles, E_demag)
+        # plt.plot(subtable["Angle"], E_demag)
     plt.legend(legend)
 
     # Show plot
