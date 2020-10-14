@@ -1,0 +1,40 @@
+//// Grid
+Nxy := 128
+Nz := 1
+SetGridSize(Nxy, Nxy, Nz)
+SetCellSize(1e-9, 1e-9, 5e-9/Nz)
+
+//// Material parameters
+Msat = 800e3
+Aex = 13e-12
+print("Exchange length:", Sqrt((2*Aex.GetRegion(0))/(mu0*Pow(Msat.GetRegion(0), 2)))) // 5.6858e-9 so ok to use Nz = 1 for 5e-9 thickness
+
+//// Shape
+geometry := Ellipse(100e-9, 65e-9)
+geometry = geometry.Add(geometry.RotZ(Pi/2))
+SetGeom(geometry)
+
+//// Track E_total, angle, shape
+TableAdd(E_total)
+TableAdd(E_zeeman)
+angle := 0.0
+angle0 := angle
+tesla := 100.0
+tesla0 := tesla
+TableAddVar(angle, "Angle", "rad")
+TableAddVar(tesla, "Field", "T")
+
+//// Sweep field strength
+for tesla=tesla0; tesla >= 1; tesla = tesla*0.5 {
+    print(sprintf("Field: %.2f T", tesla))
+
+    //// Sweep magnetization angle
+    for angle=angle0; angle < 2*Pi; angle += 0.1 {
+        m = Uniform(cos(angle), sin(angle), 0)
+		B_ext = vector(tesla*cos(angle), tesla*sin(angle), 0)
+		minimize()
+        
+        TableSave()
+        //SaveAs(m, sprintf("mPlus_%.2fT_a%.2f.ovf", tesla, angle))
+    }
+}
