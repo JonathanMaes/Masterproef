@@ -14,7 +14,7 @@ def read_mumax3_table(filename):
 
 if __name__ == "__main__":
     # table = read_mumax3_table('biaxial_island_switching_plus_remote.out/table_l65_1µs.txt')
-    table = read_mumax3_table('biaxial_island_switching_plus_alpha1e-2.out/table_l65_1µs.txt')
+    table = read_mumax3_table('biaxial_island_switching_plus_alpha1e-2_remote.out/table_l65_1µs.txt')
     # table = read_mumax3_table('biaxial_island_find_seed.out/table_seed1-10_10ns.txt')
 
     fancy = True # If fancy: follow angles past [-180°, 180°]
