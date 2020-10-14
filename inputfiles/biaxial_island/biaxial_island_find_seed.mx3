@@ -1,0 +1,46 @@
+/*
+The purpose of this program is to find a seed(s) where the switching happens very quickly after initialization, 
+such that the program does not have to run for too long.
+*/
+//// Grid
+Nxy := 32
+Nz := 1
+SetGridSize(Nxy, Nxy, Nz)
+SetCellSize(4e-9, 4e-9, 5e-9/Nz)
+
+//// Material parameters
+Msat = 800e3
+Aex = 13e-12
+print("Exchange length:", Sqrt((2*Aex.GetRegion(0))/(mu0*Pow(Msat.GetRegion(0), 2)))) // 5.6858e-9 so ok to use Nz = 1 for 5e-9 thickness
+
+//// Track E_total, angle, shape
+TableAdd(E_total)
+TableAdd(E_zeeman)
+seed := 1
+TableAddVar(seed, "Seed", "")
+TableAutoSave(1e-11)
+//AutoSave(m, 1e-9)
+
+//// Temperature
+alpha = 0.01 // If zero, temperature fluctuations are zero too
+Temp = 300
+setsolver(5)
+FixDt = 2e-13
+
+//// Shape
+geometry := Ellipse(100e-9, 65e-9)
+geometry = geometry.Add(geometry.RotZ(Pi/2))
+SetGeom(geometry)
+
+//// Screen seeds
+for seed=1; seed <= 100; seed += 1 {
+    t = 0;
+    m = Uniform(1, 0, 0)
+    randSeed(0)
+    Thermseed(seed)
+    print(sprintf("Seed: %d", seed))
+
+    //// Run simulation
+    relax()
+    Run(10e-9)
+}
