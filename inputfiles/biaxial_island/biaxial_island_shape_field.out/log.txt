@@ -1,0 +1,50 @@
+//mumax 3.10 [windows_amd64 go1.11.6(gc) CUDA-11.0]
+//GPU info: GeForce MX150(2048MB), CUDA Driver 11.0, cc=6.1, using cc=61 PTX
+//(c) Arne Vansteenkiste, Dynamat LAB, Ghent University, Belgium
+//This is free software without any warranty. See license.txt
+//********************************************************************//
+//  If you use mumax in any work or publication,                      //
+//  we kindly ask you to cite the references in references.bib        //
+//********************************************************************//
+//output directory: c:\Jonathan\UGent\Masterproef\inputfiles\biaxial_island\biaxial_island_shape_field.out/
+Nxy := 128
+Nz := 1
+SetGridSize(Nxy, Nxy, Nz)
+SetCellSize(1e-9, 1e-9, 5e-9/Nz)
+Msat = 800e3
+Aex = 13e-12
+print("Exchange length:", Sqrt((2*Aex.GetRegion(0))/(mu0*Pow(Msat.GetRegion(0), 2))))
+//Exchange length: 5.685802385313737e-09
+geometry := Ellipse(100e-9, 65e-9)
+geometry = geometry.Add(geometry.RotZ(Pi / 2))
+SetGeom(geometry)
+TableAdd(E_total)
+TableAdd(E_zeeman)
+angle := 0.0
+angle0 := angle
+tesla := 100.0
+tesla0 := tesla
+TableAddVar(angle, "Angle", "rad")
+TableAddVar(tesla, "Field", "T")
+for tesla = tesla0; tesla >= 1; tesla = tesla * 0.5 {
+	print(sprintf("Field: %.2f T", tesla))
+	for angle = angle0; angle < 2*Pi; angle += 0.1 {
+		m = Uniform(cos(angle), sin(angle), 0)
+		B_ext = vector(tesla*cos(angle), tesla*sin(angle), 0)
+		minimize()
+		TableSave()
+	}
+}
+//Field: 100.00 T
+//Field: 50.00 T
+//Field: 25.00 T
+//Field: 12.50 T
+//Field: 6.25 T
+//Field: 3.12 T
+//Field: 1.56 T
+//********************************************************************//
+//Please cite the following references, relevant for your simulation. //
+//See bibtex file in output folder for justification.                 //
+//********************************************************************//
+//   * Vansteenkiste et al., AIP Adv. 4, 107133 (2014).
+//   * Exl et al., J. Appl. Phys. 115, 17D118 (2014).
