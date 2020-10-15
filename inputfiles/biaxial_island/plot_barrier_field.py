@@ -13,14 +13,15 @@ def read_mumax3_table(filename):
 
 if __name__ == "__main__":
     # Shape anisotropy: Plus
-    shape = read_mumax3_table('biaxial_island_shape_field.out/tablePlus_65_T100-1.75_a0.1.txt')
+    shape = read_mumax3_table('biaxial_island_shape_field.out/tablePlus_65_T100-0.001_a512Pi.txt')
     legend = []
+    fields, E_min, E_max = [], [], []
     for subset in shape.groupby("Field"):
         field = subset[0]
         subtable = subset[1]
         E_demag = subtable["E_total"]-subtable["E_Zeeman"]
         diff = max(E_demag) - min(E_demag)
-        print("(%.2f T) Delta E: %.2e J = %.3f eV" % (field, diff, diff/1.602e-19))
+        print("(%.3f T) Delta E: %.2e J = %.3f eV" % (field, diff, diff/1.602e-19))
         legend.append('%.2f T' % field)
 
         angles = np.arctan2(subtable["my"], subtable["mx"])*180/np.pi
@@ -33,7 +34,19 @@ if __name__ == "__main__":
             angles = fancyAngles
         plt.plot(angles, E_demag)
         # plt.plot(subtable["Angle"], E_demag)
+        fields.append(field)
+        E_min.append(min(E_demag))
+        E_max.append(max(E_demag))
     plt.legend(legend)
 
     # Show plot
+    plt.show()
+
+    # Show trend of E_min and E_max
+    plt.plot(fields, E_min)
+    plt.scatter(fields, E_min)
+    plt.plot(fields, E_max)
+    plt.scatter(fields, E_max)
+    plt.plot(fields, [E_max[i] - E_min[i] for i, _ in enumerate(fields)])
+    plt.legend([r'$E_{min}$', r'$E_{max}$'])
     plt.show()

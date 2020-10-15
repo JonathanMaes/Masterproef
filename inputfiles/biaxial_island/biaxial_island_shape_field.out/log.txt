@@ -26,9 +26,9 @@ tesla := 100.0
 tesla0 := tesla
 TableAddVar(angle, "Angle", "rad")
 TableAddVar(tesla, "Field", "T")
-for tesla = tesla0; tesla >= 1; tesla = tesla * 0.5 {
+for tesla = tesla0; tesla >= 0.001; tesla = tesla * 0.5 {
 	print(sprintf("Field: %.2f T", tesla))
-	for angle = angle0; angle < 2*Pi; angle += 0.1 {
+	for angle = angle0; angle < 2*Pi; angle += Pi / 8 {
 		m = Uniform(cos(angle), sin(angle), 0)
 		B_ext = vector(tesla*cos(angle), tesla*sin(angle), 0)
 		minimize()
@@ -42,6 +42,16 @@ for tesla = tesla0; tesla >= 1; tesla = tesla * 0.5 {
 //Field: 6.25 T
 //Field: 3.12 T
 //Field: 1.56 T
+//Field: 0.78 T
+//Field: 0.39 T
+//Field: 0.20 T
+//Field: 0.10 T
+//Field: 0.05 T
+//Field: 0.02 T
+//Field: 0.01 T
+//Field: 0.01 T
+//Field: 0.00 T
+//Field: 0.00 T
 //********************************************************************//
 //Please cite the following references, relevant for your simulation. //
 //See bibtex file in output folder for justification.                 //
