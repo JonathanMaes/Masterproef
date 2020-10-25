@@ -1,0 +1,39 @@
+square: does not work, some numerical sinusoidal noise
+1 ellipse: does work, gives biaxial anisotropy
+
+other energy terms plotting?: doesnt yield any interesting stuff
+very weird, probably bug idk
+
+-----
+now: simulate several microseconds for 100ns switches
+
+new weirdness: for perfect circle, the energy levels are now opposite
+
+question: why is alpha=0.1, is this just because it kinda works
+answer: it is better to take alpha=0.01
+
+65nm ellipse plus sign alpha=0.1:  8 true switches in 1µs, 2 very quick back-and-forth switches
+65nm ellipse plus sign alpha=0.01: 7 true switches in 1µs, 2 very quick back-and-forth switches, total 15 times 90° turns, of which 4 180°
+
+-----
+Interesting things in mail:
+Over de "bug" in de bepaling van het energielandschap: het is ingewikkelder (interessanter!) dan we dachten.
+Blijkbaar is het zo dat het demag veld niet afhangt van de in-plane richting van de magnetisatie voor een uniform gemagnetiseerd sample (wat we ook zagen bij het zetten van de magnetisatie als uniforme toestand).
+De reden dat zo'n geometrie toch een biaxiaal energielandschap vertoont is door de afwijkingen van de uniforme toestand. Voor een vierkantje bijv. zal de magnetisatie zich min of meer parallel met de randen van het sample aligneren, waardoor de magnetisatie in het midden van het sample (die door de exchange interactie met beide zoveel mogelijk gealigneerd wil zijn) ongeveer volgens de diagonaal ligt.
+
+Als we de manier van energielandschap bepalen met het externe veld met een extreem hoog veld (1000 T) herhalen dan vinden we ook een vlak landschap. 
+Wij zijn geïnteresseerd in de energie barrière in een veld van 0T, maar die ligt altijd dus altijd volgens een energie-minimum.
+Dit betekent dat er geen heel eenvoudige manier is om de energie barrière te bepalen omdat de niet-uniformiteit van de toestand dus afhangt van de sterkte van het externe veld waarmee we de toestand aligneren.
+
+Je kan dan verder gaan met andere manieren om de hoogte van de barrière toch of te schatten:
+De barrière hoogte bepalen als functie van de sterke van het extern veld en extrapoleren naar een nulveld.
+Je zult zien dat je niet zomaar de ingestelde hoek als echte richting van de magnetisatie zal kunnen gebruiken voor (relatief) lage velden omdat die velden niet in staat zijn om de magnetisatie volledig uit haar energieminimum te trekken, je zult hiervoor dus de gemiddelde magnetisatie van het sample zelf moeten gebruiken. Wat je wel weet is dat het landschap sinusoidaal varieert als functie van de richting van de magnetisatie, dus je kunt op basis van de incomplete data voor lage velden toch het volledige landschap reconstrueren. (De barrière hoogte die je daaruit dan haalt moet je dan uitzetten als functie van veldsterkte en extrapoleren.)
+
+---
+RECENT FINDINGS:
+- When simulating with alpha=0.01, there are constant sinusoidal variations with a period of about 0.5 ns
+  These sinusoidal variations are also there with alpha=0.1, but are rougher
+
+TODO:
+- Inzoomen op 1 bepaalde flip, maar de random thermische fluctuaties werken niet echt mee
+- Energie barrière als functie van Ku1?
