@@ -1,3 +1,8 @@
+"""
+    PLOTS: - 'Energy' AS FUNCTION OF 'Relaxed magnetization angle' FOR DIFFERENT 'External magnetic field strength'
+           OR 'Energy' AS FUNCTION OF 'External magnetic field angle' FOR DIFFERENT 'External magnetic field strength'
+           - 'Energy barrier' AS FUNCTION OF 'External magnetic field strength'
+"""
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -22,7 +27,7 @@ if __name__ == "__main__":
         E_demag = subtable["E_total"]-subtable["E_Zeeman"]
         diff = max(E_demag) - min(E_demag)
         print("(%.3f T) Delta E: %.2e J = %.3f eV" % (field, diff, diff/1.602e-19))
-        legend.append('%.2f T' % field)
+        legend.append('%.4f T' % field)
 
         angles = np.arctan2(subtable["my"], subtable["mx"])*180/np.pi
         if 1: # Plot angles successively (180 -> 181 instead of 180 -> -179)
@@ -32,12 +37,19 @@ if __name__ == "__main__":
             offset = np.cumsum(offsets)
             fancyAngles = np.append([angles.iloc[0]], angles.iloc[1:] + offset)
             angles = fancyAngles
-        plt.plot(angles, E_demag)
-        # plt.plot(subtable["Angle"], E_demag)
+        
+        angles, E_demag = zip(*sorted(zip(angles, E_demag))) # Sort angles
+        plt.plot(angles, E_demag) # Energy as function of relaxed magnetization angle
+        # plt.plot(subtable["Angle"], E_demag) # Energy as function of external magnetic field angle
         fields.append(field)
         E_min.append(min(E_demag))
         E_max.append(max(E_demag))
+    E_barrier = [E_max[i] - E_min[i] for i, _ in enumerate(fields)]
     plt.legend(legend)
+    plt.xlabel(r"Relaxed magnetization angle $\theta$ [°]")
+    # plt.xlabel(r"External magnetic field angle $\theta$ [°]")
+    plt.ylabel(r"Energy [J]")
+    plt.title(r"65x100 nm double-ellipse")
 
     # Show plot
     plt.show()
@@ -47,6 +59,11 @@ if __name__ == "__main__":
     plt.scatter(fields, E_min)
     plt.plot(fields, E_max)
     plt.scatter(fields, E_max)
-    plt.plot(fields, [E_max[i] - E_min[i] for i, _ in enumerate(fields)])
-    plt.legend([r'$E_{min}$', r'$E_{max}$'])
+    plt.plot(fields, E_barrier)
+    plt.scatter(fields, E_barrier)
+    plt.legend([r'$E_{min}$', r'$E_{max}$', r'$E_{barrier}$'])
+    plt.xscale("log")
+    plt.xlabel(r"$B_{ext}$ [T]")
+    plt.ylabel(r"Energy barrier [J]")
+    plt.title(r"65x100 nm double-ellipse")
     plt.show()
