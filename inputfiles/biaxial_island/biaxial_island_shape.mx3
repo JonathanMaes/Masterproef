@@ -13,25 +13,35 @@ print("Exchange length:", Sqrt((2*Aex.GetRegion(0))/(mu0*Pow(Msat.GetRegion(0), 
 TableAdd(E_total)
 TableAdd(E_zeeman)
 angle := 0.0
-length := 100
+roundness := 1.0
+size := 128
 TableAddVar(angle, "Angle", "rad")
-TableAddVar(length, "Length", "nm")
-for length=100; length >= 10; length -= 10 {
-    print(sprintf("Short axis: %d nm", length))
+TableAddVar(roundness, "Roundness", "")
+TableAddVar(size, "Size", "nm")
+angle0 := angle
+roundness0 := roundness
+size0 := size
 
-    //// Shape
-    geometry := Ellipse(100e-9, length*1e-9)
-    geometry = geometry.Add(geometry.RotZ(Pi/2))
-    SetGeom(geometry)
-    //SaveAs(geom, sprintf("geomPlus%d", length))
+//// Loop
+for size=size0; size >= 16; size = size*0.5 {
+    for roundness=roundness0; roundness >= 0.1; roundness -= 0.01 {
+        print(sprintf("Short axis: %.2f nm", roundness*size))
+        print(sprintf("Long axis: %d nm", size))
 
-    //// Sweep magnetization
-    for angle=0.0; angle < 2*Pi; angle += 0.1 {
-        m = Uniform(cos(angle), sin(angle), 0)
-		B_ext = vector(5*cos(angle), 5*sin(angle), 0)
-		minimize()
-        
-        TableSave()
-        //SaveAs(m, sprintf("mPlus_l%d_a%.2f.ovf", length, angle))
+        //// Shape
+        geometry := Ellipse(size*1e-9, size*roundness*1e-9)
+        geometry = geometry.Add(geometry.RotZ(Pi/2))
+        SetGeom(geometry)
+        //SaveAs(geom, sprintf("geomPlus%d_%.2f", size, roundness))
+
+        //// Sweep magnetization
+        for angle=angle0; angle <= Pi/4; angle += Pi/4 {
+            m = Uniform(cos(angle), sin(angle), 0)
+            B_ext = vector(0.001*cos(angle), 0.001*sin(angle), 0)
+            minimize()
+            
+            TableSave()
+            //SaveAs(m, sprintf("mPlus_l%d_%.2f_a%.2f.ovf", size, roundness, angle))
+        }
     }
 }
