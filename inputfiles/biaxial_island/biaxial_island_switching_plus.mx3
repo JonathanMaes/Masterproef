@@ -18,7 +18,7 @@ TableAutoSave(1e-11)
 AutoSave(m, 1e-9)
 
 //// Temperature
-alpha = 0.1 // If zero, temperature fluctuations are zero too
+alpha = 0.01 // If zero, temperature fluctuations are zero too
 Temp = 300
 Thermseed(12345)
 setsolver(5)
@@ -36,5 +36,5 @@ for length=65; length >= 65; length -= 10 {
 
     //// Run simulation
     relax()
-    Run(100e-9)
+    Run(1e-6)
 }
