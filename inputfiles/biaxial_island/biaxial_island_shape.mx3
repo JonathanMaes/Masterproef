@@ -22,7 +22,7 @@ angle0 := angle
 roundness0 := roundness
 size0 := size
 
-//// Loop
+//// Loop total size and shape
 for size=size0; size >= 16; size = size*0.5 {
     for roundness=roundness0; roundness >= 0.1; roundness -= 0.01 {
         print(sprintf("Short axis: %.2f nm", roundness*size))
@@ -34,7 +34,7 @@ for size=size0; size >= 16; size = size*0.5 {
         SetGeom(geometry)
         //SaveAs(geom, sprintf("geomPlus%d_%.2f", size, roundness))
 
-        //// Sweep magnetization
+        //// Sweep magnetization angle
         for angle=angle0; angle <= Pi/4; angle += Pi/4 {
             m = Uniform(cos(angle), sin(angle), 0)
             B_ext = vector(0.001*cos(angle), 0.001*sin(angle), 0)

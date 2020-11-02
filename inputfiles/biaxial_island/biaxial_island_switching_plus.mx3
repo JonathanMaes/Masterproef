@@ -12,10 +12,14 @@ print("Exchange length:", Sqrt((2*Aex.GetRegion(0))/(mu0*Pow(Msat.GetRegion(0), 
 //// Track E_total, angle, shape
 TableAdd(E_total)
 TableAdd(E_zeeman)
-length := 90
-TableAddVar(length, "Length", "nm")
+roundness := 1.0
+size := 100
+TableAddVar(roundness, "Roundness", "")
+TableAddVar(size, "Size", "nm")
+TableAdd(Temp)
+TableAdd(alpha)
 TableAutoSave(1e-11)
-AutoSave(m, 1e-9)
+//AutoSave(m, 1e-9)
 
 //// Temperature
 alpha = 0.01 // If zero, temperature fluctuations are zero too
@@ -26,15 +30,13 @@ fixdt = 0 // Default
 
 //// Initial magnetization
 m = Uniform(1, 0, 0)
-for length=65; length >= 65; length -= 10 {
-    print(sprintf("Short axis: %d nm", length))
 
-    //// Shape
-    geometry := Ellipse(100e-9, length*1e-9)
-    geometry = geometry.Add(geometry.RotZ(Pi/2))
-    SetGeom(geometry)
+//// Shape
+geometry := Ellipse(size*1e-9, size*roundness*1e-9)
+geometry = geometry.Add(geometry.RotZ(Pi/2))
+SetGeom(geometry)
+SaveAs(geom, sprintf("geomPlus%d_%.2f.ovf", size, roundness))
 
-    //// Run simulation
-    relax()
-    Run(1e-6)
-}
+//// Run simulation
+relax()
+Run(1e-6)
