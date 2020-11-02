@@ -1,3 +1,7 @@
+/*
+    Calculates the energy landscape between 0 and 90° for different external magnetic field strengths,
+    to determine the best magnetic field strength to use in other simulations.
+*/
 //// Grid
 Nxy := 128
 Nz := 1
