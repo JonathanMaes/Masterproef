@@ -29,11 +29,11 @@ TableAddVar(angle, "Angle", "rad")
 TableAddVar(tesla, "Field", "T")
 
 //// Sweep field strength
-for tesla=tesla0; tesla >= 0.001; tesla = tesla*0.5 {
+for tesla=tesla0; tesla >= 0.001; tesla = tesla*0.25 {
     print(sprintf("Field: %.3f T", tesla))
 
     //// Sweep magnetization angle
-    for angle=angle0; angle < Pi/2; angle += Pi/512 {
+    for angle=angle0; angle < Pi/2; angle += Pi/128 {
         m = Uniform(cos(angle), sin(angle), 0)
 		B_ext = vector(tesla*cos(angle), tesla*sin(angle), 0)
 		minimize()
