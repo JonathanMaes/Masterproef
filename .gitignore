@@ -1,3 +1,4 @@
+**/.vscode/
 Literatuur/
 LaTeX/
 # Exclude all .out directories, unless they contain .ovf or .txt

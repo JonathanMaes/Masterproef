@@ -1,5 +1,5 @@
 //mumax 3.10 [windows_amd64 go1.11.6(gc) CUDA-11.0]
-//GPU info: GeForce MX150(2048MB), CUDA Driver 11.0, cc=6.1, using cc=61 PTX
+//GPU info: GeForce MX150(2048MB), CUDA Driver 11.1, cc=6.1, using cc=61 PTX
 //(c) Arne Vansteenkiste, Dynamat LAB, Ghent University, Belgium
 //This is free software without any warranty. See license.txt
 //********************************************************************//
@@ -15,70 +15,35 @@ Msat = 800e3
 Aex = 13e-12
 print("Exchange length:", Sqrt((2*Aex.GetRegion(0))/(mu0*Pow(Msat.GetRegion(0), 2))))
 //Exchange length: 5.685802385313737e-09
+geometry := Ellipse(100e-9, 65e-9)
+geometry = geometry.Add(geometry.RotZ(Pi / 2))
+SetGeom(geometry)
 TableAdd(E_total)
 TableAdd(E_zeeman)
 angle := 0.0
 angle0 := angle
-tesla := 0.001
+tesla := 100.0
 tesla0 := tesla
-size := 100
-size0 := size
 TableAddVar(angle, "Angle", "rad")
 TableAddVar(tesla, "Field", "T")
-TableAddVar(size, "Size", "nm")
-for size = size0; size >= 10; size -= 5 {
-	print(sprintf("Size: %d nm", size))
-	geometry := Ellipse(100e-9, 65e-9)
-	geometry = geometry.Add(geometry.RotZ(Pi / 2))
-	SetGeom(geometry)
-	for tesla = tesla0; tesla >= 0.001; tesla = tesla * 0.5 {
-		print(sprintf("Field: %.3f T", tesla))
-		for angle = angle0; angle <= Pi/4; angle += Pi / 4 {
-			m = Uniform(cos(angle), sin(angle), 0)
-			B_ext = vector(tesla*cos(angle), tesla*sin(angle), 0)
-			minimize()
-			TableSave()
-		}
+for tesla = tesla0; tesla >= 0.001; tesla = tesla * 0.25 {
+	print(sprintf("Field: %.3f T", tesla))
+	for angle = angle0; angle < Pi/2; angle += Pi / 128 {
+		m = Uniform(cos(angle), sin(angle), 0)
+		B_ext = vector(tesla*cos(angle), tesla*sin(angle), 0)
+		minimize()
+		TableSave()
 	}
 }
-//Size: 100 nm
-//Field: 0.001 T
-//Size: 95 nm
-//Field: 0.001 T
-//Size: 90 nm
-//Field: 0.001 T
-//Size: 85 nm
-//Field: 0.001 T
-//Size: 80 nm
-//Field: 0.001 T
-//Size: 75 nm
-//Field: 0.001 T
-//Size: 70 nm
-//Field: 0.001 T
-//Size: 65 nm
-//Field: 0.001 T
-//Size: 60 nm
-//Field: 0.001 T
-//Size: 55 nm
-//Field: 0.001 T
-//Size: 50 nm
-//Field: 0.001 T
-//Size: 45 nm
-//Field: 0.001 T
-//Size: 40 nm
-//Field: 0.001 T
-//Size: 35 nm
-//Field: 0.001 T
-//Size: 30 nm
-//Field: 0.001 T
-//Size: 25 nm
-//Field: 0.001 T
-//Size: 20 nm
-//Field: 0.001 T
-//Size: 15 nm
-//Field: 0.001 T
-//Size: 10 nm
-//Field: 0.001 T
+//Field: 100.000 T
+//Field: 25.000 T
+//Field: 6.250 T
+//Field: 1.562 T
+//Field: 0.391 T
+//Field: 0.098 T
+//Field: 0.024 T
+//Field: 0.006 T
+//Field: 0.002 T
 //********************************************************************//
 //Please cite the following references, relevant for your simulation. //
 //See bibtex file in output folder for justification.                 //
