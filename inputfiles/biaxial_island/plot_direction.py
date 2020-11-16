@@ -24,9 +24,10 @@ def read_mumax3_table(filename):
     return table
 
 if __name__ == "__main__":
-    # inFileName = 'biaxial_island_switching_plus.out/table_65x100_300K_alpha0.1_1µs.txt'
-    # inFileName = 'biaxial_island_switching_plus.out/table_65x100_300K_alpha0.01_1µs.txt'
-    inFileName = 'biaxial_island_switching_plus.out/table_100x100_300K_alpha0.01_1µs.txt'
+    # inFileName = 'biaxial_island_switching_plus.out/table_65x100_300K_alpha0.1_1µs_4nm.txt'
+    # inFileName = 'biaxial_island_switching_plus.out/table_65x100_300K_alpha0.01_1µs_4nm.txt'
+    # inFileName = 'biaxial_island_switching_plus.out/table_100x100_300K_alpha0.01_1µs_4nm.txt'
+    inFileName = 'biaxial_island_switching_plus.out/table_49x100_300K_alpha0.01_100ns_2nm.txt'
     outDir = 'Figures/Switching'
     if not os.path.exists(outDir):
         os.makedirs(outDir)
@@ -43,6 +44,8 @@ if __name__ == "__main__":
         subsets = [table]
 
     fig = plt.figure(figsize=(8.0, 5.0))
+    angleRange = [0, 0]
+    timeRange = [0, 0]
     for subtable in subsets:
         angles = np.arctan2(subtable["my"], subtable["mx"])*180/math.pi
         if not fancy:
@@ -53,13 +56,20 @@ if __name__ == "__main__":
             offsets = (np.abs(previousAngles - nextAngles) > 180)*((previousAngles > nextAngles)*2 - 1)*360
             offset = np.cumsum(offsets)
             fancyAngles = np.append([angles[0]], angles[1:] + offset)
+            angleRange[0] = min(angleRange[0], np.min(fancyAngles))
+            angleRange[1] = max(angleRange[1], np.max(fancyAngles))
+            timeRange[0] = min(timeRange[0], np.min(subtable["t"])*1e9)
+            timeRange[1] = max(timeRange[1], np.max(subtable["t"])*1e9)
             plt.plot(subtable["t"]*1e9, fancyAngles)
 
     if groupBy:
         plt.legend(legend)
 
+    plt.grid(axis='y', color='grey', linestyle=':', linewidth=1)
     plt.xlabel(r'$t$ [ns]')
     plt.ylabel(r'angle [°]')
+    plt.xlim(timeRange[0], timeRange[1])
+    plt.yticks(np.arange(angleRange[0]//90*90, angleRange[1]//90*90+91, 90))
     plt.gcf().tight_layout()
     plt.savefig(outFileName)
 

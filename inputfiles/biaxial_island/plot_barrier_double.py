@@ -1,9 +1,14 @@
 """
     PLOTS: - 'Energy barrier' AS FUNCTION OF 'Roundness' FOR DIFFERENT 'Ellipse size'
 """
+import matplotlib
+import os
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
+
+font = {'size':16}
+matplotlib.rc('font', **font)
 
 
 def read_mumax3_table(filename):
@@ -15,11 +20,20 @@ def read_mumax3_table(filename):
     return table
 
 if __name__ == "__main__":
-    # Shape anisotropy: Plus
-    shape = read_mumax3_table('biaxial_island_shape.out/tablePlus_10-100_0.1-1_aPi4_B0.001_l5_0.05.txt')
-    # shape = read_mumax3_table('biaxial_island_shape.out/tablePlus_128-16_0.1-1_aPi4_B0.001.txt')
+    inFileName = 'biaxial_island_shape.out/tablePlus_100_0.1-1_aPi4_B0.001_cell2nm.txt'
+    # inFileName = 'biaxial_island_shape.out/tablePlus_16-128_0.1-1_aPi4_B0.001_cell2nm.txt'
+    outDir = 'Figures/Barrier'
+    if not os.path.exists(outDir):
+        os.makedirs(outDir)
+    outFileName = os.path.join(outDir, os.path.splitext(os.path.basename(inFileName).split('table')[-1])[0]) + '.pdf'
+
+    shape = read_mumax3_table(inFileName)
+
+    fig = plt.figure(figsize=(8.0, 5.0))
     legend = []
-    for subset in shape.groupby("Size"):
+    USE_ELECTRONVOLT = True
+    USE_ABSOLUTE_VALUE = False
+    for subset in shape.groupby("Size", sort=False):
         size = subset[0]
         subtable = subset[1]
         E_barrier = []
@@ -28,14 +42,22 @@ if __name__ == "__main__":
             roundness = subsubset[0]
             subsubtable = subsubset[1]
             E_demag = subsubtable["E_total"]-subsubtable["E_Zeeman"]
-            diff = max(E_demag) - min(E_demag)
-            print("(%.2f x %.2f nm) Delta E: %.2e J = %.3f eV" % (size, size*roundness, diff, diff/1.602e-19))
-            E_barrier.append(diff)
+            if USE_ABSOLUTE_VALUE:
+                diff = max(E_demag) - min(E_demag)
+            elif len(E_demag) == 2:
+                diff = E_demag.iloc[1] - E_demag.iloc[0]
+            else:
+                continue
+            # print("(%.2f x %.2f nm) Delta E: %.2e J = %.3f eV" % (size, size*roundness, diff, diff/1.602e-19))
+            E_barrier.append(diff/1.602e-19 if USE_ELECTRONVOLT else diff)
             roundnesses.append(roundness)
         legend.append('%d nm' % size)
         plt.plot(roundnesses, E_barrier)
-    plt.title("Double ellipse geometry")
+
+    plt.grid(color='grey', linestyle=':', linewidth=1)
+    plt.xlabel(r'Roundness')
+    plt.ylabel(r'Energy barrier [%s]' % ('eV' if USE_ELECTRONVOLT else 'J'))
     plt.legend(legend)
-    plt.xlabel("Roundness [nm]")
-    plt.ylabel("Energy barrier [J]")
+    plt.gcf().tight_layout()
+    plt.savefig(outFileName)
     plt.show()
