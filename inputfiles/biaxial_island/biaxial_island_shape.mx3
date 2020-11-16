@@ -1,8 +1,8 @@
 //// Grid
-Nxy := 128
+Nxy := 64
 Nz := 1
 SetGridSize(Nxy, Nxy, Nz)
-SetCellSize(1e-9, 1e-9, 5e-9/Nz)
+SetCellSize(128e-9/Nxy, 128e-9/Nxy, 5e-9/Nz)
 
 //// Material parameters
 Msat = 800e3
@@ -14,7 +14,7 @@ TableAdd(E_total)
 TableAdd(E_zeeman)
 angle := 0.0
 roundness := 1.0
-size := 128
+size := 100 // [nm]
 TableAddVar(angle, "Angle", "rad")
 TableAddVar(roundness, "Roundness", "")
 TableAddVar(size, "Size", "nm")
@@ -23,8 +23,8 @@ roundness0 := roundness
 size0 := size
 
 //// Loop total size and shape
-for size=size0; size >= 16; size = size*0.5 {
-    for roundness=roundness0; roundness >= 0.1; roundness -= 0.01 {
+for size=size0; size >= 100; size = size*0.5 {
+    for roundness=roundness0; (roundness >= 0.1) && (roundness*size > 128/Nxy); roundness -= 0.01 {
         print(sprintf("Short axis: %.2f nm", roundness*size))
         print(sprintf("Long axis: %d nm", size))
 
