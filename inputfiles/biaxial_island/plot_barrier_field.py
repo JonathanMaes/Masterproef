@@ -22,6 +22,11 @@ def read_mumax3_table(filename):
     return table
 
 if __name__ == "__main__":
+    SAVE1 = False
+    SAVE2 = False
+    USE_ELECTRONVOLT = True
+    USE_RELAXED_ANGLE = True
+    
     inFileName = 'biaxial_island_shape_field.out/tablePlus_65_B25-0.001-div4_a128Pi_plotOptimized.txt'
     outDir1 = 'Figures/BarrierLandscape'
     if not os.path.exists(outDir1):
@@ -33,8 +38,6 @@ if __name__ == "__main__":
     fig = plt.figure(figsize=(8.0, 6.0))
     legend = []
     fields, E_min, E_max = [], [], []
-    USE_ELECTRONVOLT = True
-    USE_RELAXED_ANGLE = True
     ELECTRONVOLT_FACTOR = 1.602e-19 if USE_ELECTRONVOLT else 1
     for subset in shape.groupby("Field", sort=False):
         field = subset[0]
@@ -75,7 +78,8 @@ if __name__ == "__main__":
 
     # Show plot
     plt.gcf().tight_layout()
-    plt.savefig(outFileName1)
+    if SAVE1:
+        plt.savefig(outFileName1)
     plt.show()
 
 
@@ -98,5 +102,6 @@ if __name__ == "__main__":
     plt.ylabel(r"Energy barrier [%s]" % ('eV' if USE_ELECTRONVOLT else 'J'))
     plt.title(r"65x100 nm double-ellipse")
     plt.gcf().tight_layout()
-    plt.savefig(outFileName2)
+    if SAVE2:
+        plt.savefig(outFileName2)
     plt.show()
