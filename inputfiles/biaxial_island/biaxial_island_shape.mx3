@@ -1,8 +1,9 @@
 //// Grid
-Nxy := 64
+Nxy := 128
 Nz := 1
 SetGridSize(Nxy, Nxy, Nz)
 SetCellSize(128e-9/Nxy, 128e-9/Nxy, 5e-9/Nz)
+cellSize := 128e-9/Nxy
 
 //// Material parameters
 Msat = 800e3
@@ -18,6 +19,7 @@ size := 100 // [nm]
 TableAddVar(angle, "Angle", "rad")
 TableAddVar(roundness, "Roundness", "")
 TableAddVar(size, "Size", "nm")
+TableAddVar(cellSize, "Cell_size", "m")
 angle0 := angle
 roundness0 := roundness
 size0 := size
