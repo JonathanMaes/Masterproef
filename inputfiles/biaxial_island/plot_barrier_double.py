@@ -9,6 +9,7 @@ import pandas as pd
 
 font = {'size':16}
 matplotlib.rc('font', **font)
+matplotlib.rcParams['axes.prop_cycle'] = matplotlib.cycler(color=["b", "y", "r", "lightblue"]) 
 
 
 def read_mumax3_table(filename):
@@ -20,8 +21,8 @@ def read_mumax3_table(filename):
     return table
 
 if __name__ == "__main__":
-    inFileName = 'biaxial_island_shape.out/tablePlus_100_0.1-1_aPi4_B0.001_cell2nm.txt'
-    # inFileName = 'biaxial_island_shape.out/tablePlus_16-128_0.1-1_aPi4_B0.001_cell2nm.txt'
+    inFileName = 'biaxial_island_shape.out/tablePlus_100_0.1-1_aPi4_B0.001.txt'
+    # inFileName = 'biaxial_island_shape.out/tablePlus_100_0.1-1_aPi4_B0.001_cell1nm.txt'
     outDir = 'Figures/Barrier'
     if not os.path.exists(outDir):
         os.makedirs(outDir)
@@ -32,8 +33,10 @@ if __name__ == "__main__":
     fig = plt.figure(figsize=(8.0, 5.0))
     legend = []
     USE_ELECTRONVOLT = True
+    # GROUP_BY = "Size"
+    GROUP_BY = "Cell_size"
     USE_ABSOLUTE_VALUE = False
-    for subset in shape.groupby("Size", sort=False):
+    for subset in shape.groupby(GROUP_BY, sort=False):
         size = subset[0]
         subtable = subset[1]
         E_barrier = []
@@ -51,7 +54,10 @@ if __name__ == "__main__":
             # print("(%.2f x %.2f nm) Delta E: %.2e J = %.3f eV" % (size, size*roundness, diff, diff/1.602e-19))
             E_barrier.append(diff/1.602e-19 if USE_ELECTRONVOLT else diff)
             roundnesses.append(roundness)
-        legend.append('%d nm' % size)
+        if GROUP_BY == "Size":
+            legend.append('%d nm' % size)
+        elif GROUP_BY == "Cell_size":
+            legend.append('%d nm' % (size*1e9))
         plt.plot(roundnesses, E_barrier)
 
     plt.grid(color='grey', linestyle=':', linewidth=1)
