@@ -22,8 +22,7 @@ def read_mumax3_table(filename):
     return table
 
 if __name__ == "__main__":
-    SAVE1 = False
-    SAVE2 = False
+    SAVE = True
     USE_ELECTRONVOLT = True
     USE_RELAXED_ANGLE = True
     SUBTRACT_ZEEMAN = False
@@ -34,9 +33,9 @@ if __name__ == "__main__":
     # inFileName = 'biaxial_island_shape_field_external.out/tableExt_K0.1Ms2_aPi2.txt' #Bias with custom field, should correspond to normal 0.1T bias using B_ext
     # inFileName = 'biaxial_island_shape_field_external.out/tableExt_B0.1_aPi2.txt' #Is normal 0.1T bias using B_ext
     ## Results
-    inFileName = 'biaxial_island_shape_field_external.out/tableExt_K0.1Ms2_Bext1e-2-1e-4_aPi4.txt'  #MAIN RESULT FOR B_ext AT PI/4
+    # inFileName = 'biaxial_island_shape_field_external.out/tableExt_K0.1Ms2_Bext1e-2-1e-4_aPi4.txt'  #MAIN RESULT FOR B_ext AT PI/4
     # inFileName = 'biaxial_island_shape_field_external.out/tableExt_K0.1Ms2_Bext1e-2-1e-4_a3Pi8.txt' #MAIN RESULT FOR B_ext AT 3PI/8
-    # inFileName = 'biaxial_island_shape_field_external.out/tableExt_K0.1Ms2_Bext1e-2-1e-4_aPi2.txt'  #MAIN RESULT FOR B_ext AT PI/2
+    inFileName = 'biaxial_island_shape_field_external.out/tableExt_K0.1Ms2_Bext1e-2-1e-4_aPi2.txt'  #MAIN RESULT FOR B_ext AT PI/2
     outDir1 = 'Figures/BarrierLandscape'
     if not os.path.exists(outDir1):
         os.makedirs(outDir1)
@@ -92,6 +91,6 @@ if __name__ == "__main__":
 
     # Show plot
     plt.gcf().tight_layout()
-    if SAVE1:
+    if SAVE:
         plt.savefig(outFileName1)
     plt.show()
