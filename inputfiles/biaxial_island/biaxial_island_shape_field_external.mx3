@@ -1,0 +1,67 @@
+/*
+    Calculates the energy landscape between 0 and 90° for different external magnetic field strengths, 
+    while retaining a small bias field along a certain direction to calculate the energy landscape.
+*/
+//// Grid
+Nxy := 128
+Nz := 1
+SetGridSize(Nxy, Nxy, Nz)
+SetCellSize(1e-9, 1e-9, 5e-9/Nz)
+
+//// Material parameters
+Ms := 800e3
+Msat = Ms
+Aex = 13e-12
+print("Exchange length:", Sqrt((2*Aex.GetRegion(0))/(mu0*Pow(Msat.GetRegion(0), 2)))) // 5.6858e-9 so ok to use Nz = 1 for 5e-9 thickness
+
+//// Custom quantities
+angle := 0.0
+angle0 := angle
+external := 0.01
+external0 := external
+externalAngle := 3*Pi/8
+externalAngle0 := externalAngle
+bias := 0.1 // This gives a slightly higher energy than normal while retaining the initial direction pretty well
+bias0 := bias
+K := bias * Ms/2 // 0.5*Ms/2 gives the same as ~0.1 Tesla field (why? idk)
+
+//// Shape
+geometry := Ellipse(100e-9, 65e-9)
+geometry = geometry.Add(geometry.RotZ(Pi/2))
+SetGeom(geometry)
+
+//// Track E_total, angle, shape
+TableAdd(E_total) // Total energy
+TableAdd(E_zeeman) // External field
+tableAdd(E_custom) // Bias field to keep magnetization in certain direction
+TableAddVar(angle, "Angle_bias", "rad")
+TableAddVar(bias, "Field_bias", "T")
+TableAddVar(external, "Field_ext", "T")
+TableAddVar(externalAngle, "Angle_ext", "rad")
+
+//// Sweep field strength
+u := ConstVector(1, 0, 0)
+anisField := Mul( Const(2*K/Ms)  , Mul( Dot(u, m), u))
+anisEdens := Mul( Const(-0.5*Ms) , Dot( anisField, m))
+for external=external0; external >= 0.0001; external = external*0.5 {
+    print(sprintf("Field: %.3f mT", external*1e3))
+
+    //// Sweep magnetization angle
+    for angle=angle0; angle < 2*Pi; angle += Pi/128 {
+        //// Custom field (to keep average magnetization in certain direction)
+        RemoveCustomFields()
+        u = ConstVector(cos(angle), sin(angle), 0)
+        anisField = Mul( Const(2*K/Ms)  , Mul( Dot(u, m), u))
+        anisEdens = Mul( Const(-0.5*Ms) , Dot( anisField, m))
+        AddFieldTerm(anisField) // promote anisField to an effective field term
+        AddEdensTerm(anisEdens) // promote anisEdens to an effective energy term
+
+        //// Magnetization and external field
+        m = Uniform(cos(angle), sin(angle), 0)
+		B_ext = vector(external*cos(externalAngle), external*sin(externalAngle), 0)
+        minimize()
+        
+        TableSave()
+        //SaveAs(m, sprintf("mPlus_%.3fT_a%.2f.ovf", tesla, angle))
+    }
+}
