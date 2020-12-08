@@ -1,0 +1,231 @@
+//mumax 3.10 [windows_amd64 go1.11.6(gc) CUDA-11.0]
+//GPU info: GeForce MX150(2048MB), CUDA Driver 11.1, cc=6.1, using cc=61 PTX
+//(c) Arne Vansteenkiste, Dynamat LAB, Ghent University, Belgium
+//This is free software without any warranty. See license.txt
+//********************************************************************//
+//  If you use mumax in any work or publication,                      //
+//  we kindly ask you to cite the references in references.bib        //
+//********************************************************************//
+//output directory: c:\Jonathan\UGent\Masterproef\inputfiles\biaxial_island\biaxial_island_shape.out/
+Nxy := 32
+Nz := 1
+SetGridSize(Nxy, Nxy, Nz)
+SetCellSize(128e-9/Nxy, 128e-9/Nxy, 5e-9/Nz)
+cellSize := 128e-9 / Nxy
+Msat = 800e3
+Aex = 13e-12
+print("Exchange length:", Sqrt((2*Aex.GetRegion(0))/(mu0*Pow(Msat.GetRegion(0), 2))))
+//Exchange length: 5.685802385313737e-09
+TableAdd(E_total)
+TableAdd(E_zeeman)
+angle := 0.0
+roundness := 1.0
+size := 100
+TableAddVar(angle, "Angle", "rad")
+TableAddVar(roundness, "Roundness", "")
+TableAddVar(size, "Size", "nm")
+TableAddVar(cellSize, "Cell_size", "m")
+angle0 := angle
+roundness0 := roundness
+size0 := size
+for size = size0; size >= 100; size = size * 0.5 {
+	for roundness = roundness0; (roundness >= 0.1) && (roundness*size > 128/Nxy); roundness -= 0.01 {
+		print(sprintf("Short axis: %.2f nm", roundness*size))
+		print(sprintf("Long axis: %d nm", size))
+		geometry := Ellipse(size*1e-9, size*roundness*1e-9)
+		geometry = geometry.Add(geometry.RotZ(Pi / 2))
+		SetGeom(geometry)
+		for angle = angle0; angle <= Pi/4; angle += Pi / 4 {
+			m = Uniform(cos(angle), sin(angle), 0)
+			B_ext = vector(0.001*cos(angle), 0.001*sin(angle), 0)
+			minimize()
+			TableSave()
+		}
+	}
+}
+//Short axis: 100.00 nm
+//Long axis: 100 nm
+//Short axis: 99.00 nm
+//Long axis: 100 nm
+//Short axis: 98.00 nm
+//Long axis: 100 nm
+//Short axis: 97.00 nm
+//Long axis: 100 nm
+//Short axis: 96.00 nm
+//Long axis: 100 nm
+//Short axis: 95.00 nm
+//Long axis: 100 nm
+//Short axis: 94.00 nm
+//Long axis: 100 nm
+//Short axis: 93.00 nm
+//Long axis: 100 nm
+//Short axis: 92.00 nm
+//Long axis: 100 nm
+//Short axis: 91.00 nm
+//Long axis: 100 nm
+//Short axis: 90.00 nm
+//Long axis: 100 nm
+//Short axis: 89.00 nm
+//Long axis: 100 nm
+//Short axis: 88.00 nm
+//Long axis: 100 nm
+//Short axis: 87.00 nm
+//Long axis: 100 nm
+//Short axis: 86.00 nm
+//Long axis: 100 nm
+//Short axis: 85.00 nm
+//Long axis: 100 nm
+//Short axis: 84.00 nm
+//Long axis: 100 nm
+//Short axis: 83.00 nm
+//Long axis: 100 nm
+//Short axis: 82.00 nm
+//Long axis: 100 nm
+//Short axis: 81.00 nm
+//Long axis: 100 nm
+//Short axis: 80.00 nm
+//Long axis: 100 nm
+//Short axis: 79.00 nm
+//Long axis: 100 nm
+//Short axis: 78.00 nm
+//Long axis: 100 nm
+//Short axis: 77.00 nm
+//Long axis: 100 nm
+//Short axis: 76.00 nm
+//Long axis: 100 nm
+//Short axis: 75.00 nm
+//Long axis: 100 nm
+//Short axis: 74.00 nm
+//Long axis: 100 nm
+//Short axis: 73.00 nm
+//Long axis: 100 nm
+//Short axis: 72.00 nm
+//Long axis: 100 nm
+//Short axis: 71.00 nm
+//Long axis: 100 nm
+//Short axis: 70.00 nm
+//Long axis: 100 nm
+//Short axis: 69.00 nm
+//Long axis: 100 nm
+//Short axis: 68.00 nm
+//Long axis: 100 nm
+//Short axis: 67.00 nm
+//Long axis: 100 nm
+//Short axis: 66.00 nm
+//Long axis: 100 nm
+//Short axis: 65.00 nm
+//Long axis: 100 nm
+//Short axis: 64.00 nm
+//Long axis: 100 nm
+//Short axis: 63.00 nm
+//Long axis: 100 nm
+//Short axis: 62.00 nm
+//Long axis: 100 nm
+//Short axis: 61.00 nm
+//Long axis: 100 nm
+//Short axis: 60.00 nm
+//Long axis: 100 nm
+//Short axis: 59.00 nm
+//Long axis: 100 nm
+//Short axis: 58.00 nm
+//Long axis: 100 nm
+//Short axis: 57.00 nm
+//Long axis: 100 nm
+//Short axis: 56.00 nm
+//Long axis: 100 nm
+//Short axis: 55.00 nm
+//Long axis: 100 nm
+//Short axis: 54.00 nm
+//Long axis: 100 nm
+//Short axis: 53.00 nm
+//Long axis: 100 nm
+//Short axis: 52.00 nm
+//Long axis: 100 nm
+//Short axis: 51.00 nm
+//Long axis: 100 nm
+//Short axis: 50.00 nm
+//Long axis: 100 nm
+//Short axis: 49.00 nm
+//Long axis: 100 nm
+//Short axis: 48.00 nm
+//Long axis: 100 nm
+//Short axis: 47.00 nm
+//Long axis: 100 nm
+//Short axis: 46.00 nm
+//Long axis: 100 nm
+//Short axis: 45.00 nm
+//Long axis: 100 nm
+//Short axis: 44.00 nm
+//Long axis: 100 nm
+//Short axis: 43.00 nm
+//Long axis: 100 nm
+//Short axis: 42.00 nm
+//Long axis: 100 nm
+//Short axis: 41.00 nm
+//Long axis: 100 nm
+//Short axis: 40.00 nm
+//Long axis: 100 nm
+//Short axis: 39.00 nm
+//Long axis: 100 nm
+//Short axis: 38.00 nm
+//Long axis: 100 nm
+//Short axis: 37.00 nm
+//Long axis: 100 nm
+//Short axis: 36.00 nm
+//Long axis: 100 nm
+//Short axis: 35.00 nm
+//Long axis: 100 nm
+//Short axis: 34.00 nm
+//Long axis: 100 nm
+//Short axis: 33.00 nm
+//Long axis: 100 nm
+//Short axis: 32.00 nm
+//Long axis: 100 nm
+//Short axis: 31.00 nm
+//Long axis: 100 nm
+//Short axis: 30.00 nm
+//Long axis: 100 nm
+//Short axis: 29.00 nm
+//Long axis: 100 nm
+//Short axis: 28.00 nm
+//Long axis: 100 nm
+//Short axis: 27.00 nm
+//Long axis: 100 nm
+//Short axis: 26.00 nm
+//Long axis: 100 nm
+//Short axis: 25.00 nm
+//Long axis: 100 nm
+//Short axis: 24.00 nm
+//Long axis: 100 nm
+//Short axis: 23.00 nm
+//Long axis: 100 nm
+//Short axis: 22.00 nm
+//Long axis: 100 nm
+//Short axis: 21.00 nm
+//Long axis: 100 nm
+//Short axis: 20.00 nm
+//Long axis: 100 nm
+//Short axis: 19.00 nm
+//Long axis: 100 nm
+//Short axis: 18.00 nm
+//Long axis: 100 nm
+//Short axis: 17.00 nm
+//Long axis: 100 nm
+//Short axis: 16.00 nm
+//Long axis: 100 nm
+//Short axis: 15.00 nm
+//Long axis: 100 nm
+//Short axis: 14.00 nm
+//Long axis: 100 nm
+//Short axis: 13.00 nm
+//Long axis: 100 nm
+//Short axis: 12.00 nm
+//Long axis: 100 nm
+//Short axis: 11.00 nm
+//Long axis: 100 nm
+//********************************************************************//
+//Please cite the following references, relevant for your simulation. //
+//See bibtex file in output folder for justification.                 //
+//********************************************************************//
+//   * Vansteenkiste et al., AIP Adv. 4, 107133 (2014).
+//   * Exl et al., J. Appl. Phys. 115, 17D118 (2014).
