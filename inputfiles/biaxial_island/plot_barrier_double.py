@@ -22,7 +22,7 @@ def read_mumax3_table(filename):
 
 if __name__ == "__main__":
     inFileName = 'biaxial_island_shape.out/tablePlus_100_0.1-1_aPi4_B0.001.txt'
-    # inFileName = 'biaxial_island_shape.out/tablePlus_100_0.1-1_aPi4_B0.001_cell1nm.txt'
+    # inFileName = 'biaxial_island_shape.out/tablePlus_100_0.1-1_aPi4_B0.001_cell3.125nm.txt'
     outDir = 'Figures/Barrier'
     if not os.path.exists(outDir):
         os.makedirs(outDir)
@@ -55,9 +55,9 @@ if __name__ == "__main__":
             E_barrier.append(diff/1.602e-19 if USE_ELECTRONVOLT else diff)
             roundnesses.append(roundness)
         if GROUP_BY == "Size":
-            legend.append('%d nm' % size)
+            legend.append('%s nm' % size)
         elif GROUP_BY == "Cell_size":
-            legend.append('%d nm' % (size*1e9))
+            legend.append('%s nm' % (size*1e9))
         plt.plot(roundnesses, E_barrier)
 
     plt.grid(color='grey', linestyle=':', linewidth=1)

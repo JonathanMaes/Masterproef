@@ -9,9 +9,9 @@
 //output directory: c:\Jonathan\UGent\Masterproef\inputfiles\biaxial_island\biaxial_island_shape.out/
 Nxy := 32
 Nz := 1
+cellSize := 100e-9 / Nxy
 SetGridSize(Nxy, Nxy, Nz)
-SetCellSize(128e-9/Nxy, 128e-9/Nxy, 5e-9/Nz)
-cellSize := 128e-9 / Nxy
+SetCellSize(cellSize, cellSize, 5e-9/Nz)
 Msat = 800e3
 Aex = 13e-12
 print("Exchange length:", Sqrt((2*Aex.GetRegion(0))/(mu0*Pow(Msat.GetRegion(0), 2))))

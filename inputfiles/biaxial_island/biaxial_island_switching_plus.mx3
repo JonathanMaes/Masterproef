@@ -1,9 +1,9 @@
 //// Grid
 Nxy := 32
 Nz := 1
+cellSize := 100e-9/Nxy
 SetGridSize(Nxy, Nxy, Nz)
-SetCellSize(128e-9/Nxy, 128e-9/Nxy, 5e-9/Nz)
-cellSize := 128e-9/Nxy
+SetCellSize(cellSize, cellSize, 5e-9/Nz)
 
 //// Material parameters
 Msat = 800e3
