@@ -3,10 +3,11 @@
     while retaining a small bias field along a certain direction to calculate the energy landscape.
 */
 //// Grid
-Nxy := 128
+Nxy := 16
 Nz := 1
+cellSize := 50e-9/Nxy
 SetGridSize(Nxy, Nxy, Nz)
-SetCellSize(1e-9, 1e-9, 5e-9/Nz)
+SetCellSize(cellSize, cellSize, 5e-9/Nz)
 
 //// Material parameters
 Ms := 800e3
@@ -17,16 +18,16 @@ print("Exchange length:", Sqrt((2*Aex.GetRegion(0))/(mu0*Pow(Msat.GetRegion(0), 
 //// Custom quantities
 angle := 0.0
 angle0 := angle
-external := 0.01
+external := 0.0001
 external0 := external
 externalAngle := 3*Pi/8
 externalAngle0 := externalAngle
 bias := 0.1 // This gives a slightly higher energy than normal while retaining the initial direction pretty well
 bias0 := bias
-K := bias * Ms/2 // 0.5*Ms/2 gives the same as ~0.1 Tesla field (why? idk)
+K := bias*Ms/2
 
 //// Shape
-geometry := Ellipse(100e-9, 65e-9)
+geometry := Ellipse(50e-9, 45e-9)
 geometry = geometry.Add(geometry.RotZ(Pi/2))
 SetGeom(geometry)
 
@@ -43,7 +44,7 @@ TableAddVar(externalAngle, "Angle_ext", "rad")
 u := ConstVector(1, 0, 0)
 anisField := Mul( Const(2*K/Ms)  , Mul( Dot(u, m), u))
 anisEdens := Mul( Const(-0.5*Ms) , Dot( anisField, m))
-for external=external0; external >= 0.0001; external = external*0.5 {
+//for external=external0; external >= 0.0001; external = external*0.5 {
     print(sprintf("Field: %.3f mT", external*1e3))
 
     //// Sweep magnetization angle
@@ -64,4 +65,4 @@ for external=external0; external >= 0.0001; external = external*0.5 {
         TableSave()
         //SaveAs(m, sprintf("mPlus_%.3fT_a%.2f.ovf", tesla, angle))
     }
-}
+//}

@@ -26,8 +26,13 @@ def read_mumax3_table(filename):
 if __name__ == "__main__":
     # inFileName = 'biaxial_island_switching_plus.out/table_65x100_300K_alpha0.1_1µs_4nm.txt'
     # inFileName = 'biaxial_island_switching_plus.out/table_65x100_300K_alpha0.01_1µs_4nm.txt'
-    # inFileName = 'biaxial_island_switching_plus.out/table_100x100_300K_alpha0.01_1µs_4nm.txt'
-    inFileName = 'biaxial_island_switching_plus.out/table_49x100_300K_alpha0.01_100ns_2nm.txt'
+    # inFileName = 'biaxial_island_switching_plus.out/table_65x100_350K_alpha0.01_1µs_4nm.txt'
+    # inFileName = 'biaxial_island_switching_plus.out/table_65x100_273K_alpha0.01_1µs_4nm.txt'
+    # inFileName = 'biaxial_island_switching_plus.out/table_100x100_350K_alpha0.01_1µs_4nm.txt'
+    # inFileName = 'biaxial_island_switching_plus.out/table_49x100_300K_alpha0.01_100ns_2nm.txt'
+    # inFileName = 'biaxial_island_switching_plus.out/table_65x100_350K_alpha0.01_0.5µs_2nm.txt'
+    # inFileName = 'biaxial_island_switching_plus.out/table_65x100_350K_alpha0.01_1µs_3.125nm.txt'
+    inFileName = 'biaxial_island_switching_extfield.out/table_50x45_ext0.00015_ext3Pi8_1.25µs_3.125nm.txt'
     outDir = 'Figures/Switching'
     if not os.path.exists(outDir):
         os.makedirs(outDir)

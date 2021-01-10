@@ -35,7 +35,8 @@ if __name__ == "__main__":
     ## Results
     # inFileName = 'biaxial_island_shape_field_external.out/tableExt_K0.1Ms2_Bext1e-2-1e-4_aPi4.txt'  #MAIN RESULT FOR B_ext AT PI/4
     # inFileName = 'biaxial_island_shape_field_external.out/tableExt_K0.1Ms2_Bext1e-2-1e-4_a3Pi8.txt' #MAIN RESULT FOR B_ext AT 3PI/8
-    inFileName = 'biaxial_island_shape_field_external.out/tableExt_K0.1Ms2_Bext1e-2-1e-4_aPi2.txt'  #MAIN RESULT FOR B_ext AT PI/2
+    # inFileName = 'biaxial_island_shape_field_external.out/tableExt_K0.1Ms2_Bext1e-2-1e-4_aPi2.txt'  #MAIN RESULT FOR B_ext AT PI/2
+    inFileName = 'biaxial_island_shape_field_external.out/tableExt_K0.1Ms2_Bext0.00015_a3Pi8_50x45_3.125nm.txt'  #For asymmetric test
     outDir1 = 'Figures/BarrierLandscape'
     if not os.path.exists(outDir1):
         os.makedirs(outDir1)
@@ -87,7 +88,8 @@ if __name__ == "__main__":
         plt.ylim([8.1e-19/ELECTRONVOLT_FACTOR, 8.8e-19/ELECTRONVOLT_FACTOR])
     plt.xlabel(r"Relaxed magnetization angle $\theta$ [°]" if USE_RELAXED_ANGLE else r"External magnetic field angle $\theta$ [°]")
     plt.ylabel(r"Energy [%s]" % ('eV' if USE_ELECTRONVOLT else 'J'))
-    plt.title(r"65x100 nm double-ellipse")
+    # plt.title(r"65x100 nm double-ellipse")
+    plt.title(r"50x45 nm double-ellipse")
 
     # Show plot
     plt.gcf().tight_layout()

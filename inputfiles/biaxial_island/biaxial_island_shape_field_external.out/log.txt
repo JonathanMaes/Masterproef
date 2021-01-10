@@ -7,10 +7,11 @@
 //  we kindly ask you to cite the references in references.bib        //
 //********************************************************************//
 //output directory: c:\Jonathan\UGent\Masterproef\inputfiles\biaxial_island\biaxial_island_shape_field_external.out/
-Nxy := 128
+Nxy := 16
 Nz := 1
+cellSize := 50e-9 / Nxy
 SetGridSize(Nxy, Nxy, Nz)
-SetCellSize(1e-9, 1e-9, 5e-9/Nz)
+SetCellSize(cellSize, cellSize, 5e-9/Nz)
 Ms := 800e3
 Msat = Ms
 Aex = 13e-12
@@ -18,14 +19,14 @@ print("Exchange length:", Sqrt((2*Aex.GetRegion(0))/(mu0*Pow(Msat.GetRegion(0), 
 //Exchange length: 5.685802385313737e-09
 angle := 0.0
 angle0 := angle
-external := 0.01
+external := 0.00015
 external0 := external
 externalAngle := 3 * Pi / 8
 externalAngle0 := externalAngle
 bias := 0.1
 bias0 := bias
 K := bias * Ms / 2
-geometry := Ellipse(100e-9, 65e-9)
+geometry := Ellipse(50e-9, 45e-9)
 geometry = geometry.Add(geometry.RotZ(Pi / 2))
 SetGeom(geometry)
 TableAdd(E_total)
@@ -38,28 +39,20 @@ TableAddVar(externalAngle, "Angle_ext", "rad")
 u := ConstVector(1, 0, 0)
 anisField := Mul(Const(2*K/Ms), Mul(Dot(u, m), u))
 anisEdens := Mul(Const(-0.5*Ms), Dot(anisField, m))
-for external = external0; external >= 0.0001; external = external * 0.5 {
-	print(sprintf("Field: %.3f mT", external*1e3))
-	for angle = angle0; angle < 2*Pi; angle += Pi / 128 {
-		RemoveCustomFields()
-		u = ConstVector(cos(angle), sin(angle), 0)
-		anisField = Mul(Const(2*K/Ms), Mul(Dot(u, m), u))
-		anisEdens = Mul(Const(-0.5*Ms), Dot(anisField, m))
-		AddFieldTerm(anisField)
-		AddEdensTerm(anisEdens)
-		m = Uniform(cos(angle), sin(angle), 0)
-		B_ext = vector(external*cos(externalAngle), external*sin(externalAngle), 0)
-		minimize()
-		TableSave()
-	}
+print(sprintf("Field: %.3f mT", external*1e3))
+//Field: 0.150 mT
+for angle = angle0; angle < 2*Pi; angle += Pi / 128 {
+	RemoveCustomFields()
+	u = ConstVector(cos(angle), sin(angle), 0)
+	anisField = Mul(Const(2*K/Ms), Mul(Dot(u, m), u))
+	anisEdens = Mul(Const(-0.5*Ms), Dot(anisField, m))
+	AddFieldTerm(anisField)
+	AddEdensTerm(anisEdens)
+	m = Uniform(cos(angle), sin(angle), 0)
+	B_ext = vector(external*cos(externalAngle), external*sin(externalAngle), 0)
+	minimize()
+	TableSave()
 }
-//Field: 10.000 mT
-//Field: 5.000 mT
-//Field: 2.500 mT
-//Field: 1.250 mT
-//Field: 0.625 mT
-//Field: 0.312 mT
-//Field: 0.156 mT
 //********************************************************************//
 //Please cite the following references, relevant for your simulation. //
 //See bibtex file in output folder for justification.                 //

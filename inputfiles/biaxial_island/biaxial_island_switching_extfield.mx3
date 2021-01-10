@@ -1,0 +1,50 @@
+//// Grid
+Nxy := 16
+Nz := 1
+cellSize := 50e-9/Nxy
+SetGridSize(Nxy, Nxy, Nz)
+SetCellSize(cellSize, cellSize, 5e-9/Nz)
+
+//// Material parameters
+Msat = 800e3
+Aex = 13e-12
+print("Exchange length:", Sqrt((2*Aex.GetRegion(0))/(mu0*Pow(Msat.GetRegion(0), 2)))) // 5.6858e-9 so ok to use Nz = 1 for 5e-9 thickness
+
+//// Custom quantities
+external := 0.00015
+externalAngle := 3*Pi/8
+
+//// Track E_total, angle, shape
+TableAdd(E_total)
+TableAdd(E_zeeman)
+roundness := 0.9
+size := 50
+TableAddVar(roundness, "Roundness", "")
+TableAddVar(size, "Size", "nm")
+TableAddVar(external, "Field_ext", "T")
+TableAdd(Temp)
+TableAdd(alpha)
+TableAddVar(cellSize, "Cell_size", "m")
+TableAutoSave(1e-11)
+//AutoSave(m, 1e-9)
+
+//// Temperature
+alpha = 0.01 // If zero, temperature fluctuations are zero too
+Temp = 300
+Thermseed(12345)
+setsolver(5)
+fixdt = 0 // Default
+
+//// Initial magnetization
+m = Uniform(1, 0, 0)
+B_ext = vector(external*cos(externalAngle), external*sin(externalAngle), 0)
+
+//// Shape
+geometry := Ellipse(size*1e-9, size*roundness*1e-9)
+geometry = geometry.Add(geometry.RotZ(Pi/2))
+SetGeom(geometry)
+SaveAs(geom, sprintf("geomPlus%d_%.2f.ovf", size, roundness))
+
+//// Run simulation
+relax()
+Run(1e-5)
