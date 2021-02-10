@@ -25,14 +25,16 @@ def read_mumax3_table(filename):
 
 if __name__ == "__main__":
     # inFileName = 'biaxial_island_switching_plus.out/table_65x100_300K_alpha0.1_1µs_4nm.txt'
-    # inFileName = 'biaxial_island_switching_plus.out/table_65x100_300K_alpha0.01_1µs_4nm.txt'
+    inFileName = 'biaxial_island_switching_plus.out/table_65x100_300K_alpha0.01_1µs_4nm.txt'
     # inFileName = 'biaxial_island_switching_plus.out/table_65x100_350K_alpha0.01_1µs_4nm.txt'
     # inFileName = 'biaxial_island_switching_plus.out/table_65x100_273K_alpha0.01_1µs_4nm.txt'
     # inFileName = 'biaxial_island_switching_plus.out/table_100x100_350K_alpha0.01_1µs_4nm.txt'
     # inFileName = 'biaxial_island_switching_plus.out/table_49x100_300K_alpha0.01_100ns_2nm.txt'
     # inFileName = 'biaxial_island_switching_plus.out/table_65x100_350K_alpha0.01_0.5µs_2nm.txt'
     # inFileName = 'biaxial_island_switching_plus.out/table_65x100_350K_alpha0.01_1µs_3.125nm.txt'
-    inFileName = 'biaxial_island_switching_extfield.out/table_50x45_ext0.00015_ext3Pi8_1.25µs_3.125nm.txt'
+    # inFileName = 'biaxial_island_switching_extfield.out/table_50x45_ext0.00015_ext3Pi8_1.25µs_3.125nm.txt'
+    # inFileName = 'biaxial_island_switching_extfield.out/table_50x45_ext0_10ns_3.125nm.txt'
+    # inFileName = 'biaxial_island_switching_extfield.out/table.txt'
     outDir = 'Figures/Switching'
     if not os.path.exists(outDir):
         os.makedirs(outDir)
@@ -53,6 +55,8 @@ if __name__ == "__main__":
     timeRange = [0, 0]
     for subtable in subsets:
         angles = np.arctan2(subtable["my"], subtable["mx"])*180/math.pi
+        timeRange[0] = min(timeRange[0], np.min(subtable["t"])*1e9)
+        timeRange[1] = max(timeRange[1], np.max(subtable["t"])*1e9)
         if not fancy:
             plt.plot(subtable["t"]*1e9, angles)
         else:
@@ -63,8 +67,6 @@ if __name__ == "__main__":
             fancyAngles = np.append([angles[0]], angles[1:] + offset)
             angleRange[0] = min(angleRange[0], np.min(fancyAngles))
             angleRange[1] = max(angleRange[1], np.max(fancyAngles))
-            timeRange[0] = min(timeRange[0], np.min(subtable["t"])*1e9)
-            timeRange[1] = max(timeRange[1], np.max(subtable["t"])*1e9)
             plt.plot(subtable["t"]*1e9, fancyAngles)
 
     if groupBy:
@@ -74,7 +76,8 @@ if __name__ == "__main__":
     plt.xlabel(r'$t$ [ns]')
     plt.ylabel(r'angle [°]')
     plt.xlim(timeRange[0], timeRange[1])
-    plt.yticks(np.arange(angleRange[0]//90*90, angleRange[1]//90*90+91, 90))
+    angle_interval = 90
+    plt.yticks(np.arange(angleRange[0]//angle_interval*angle_interval, angleRange[1]//angle_interval*angle_interval+angle_interval+1, angle_interval))
     plt.gcf().tight_layout()
     plt.savefig(outFileName)
 

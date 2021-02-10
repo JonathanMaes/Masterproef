@@ -34,9 +34,9 @@ if __name__ == "__main__":
     # inFileName = 'biaxial_island_shape_field_external.out/tableExt_B0.1_aPi2.txt' #Is normal 0.1T bias using B_ext
     ## Results
     # inFileName = 'biaxial_island_shape_field_external.out/tableExt_K0.1Ms2_Bext1e-2-1e-4_aPi4.txt'  #MAIN RESULT FOR B_ext AT PI/4
-    # inFileName = 'biaxial_island_shape_field_external.out/tableExt_K0.1Ms2_Bext1e-2-1e-4_a3Pi8.txt' #MAIN RESULT FOR B_ext AT 3PI/8
+    inFileName = 'biaxial_island_shape_field_external.out/tableExt_K0.1Ms2_Bext1e-2-1e-4_a3Pi8.txt' #MAIN RESULT FOR B_ext AT 3PI/8
     # inFileName = 'biaxial_island_shape_field_external.out/tableExt_K0.1Ms2_Bext1e-2-1e-4_aPi2.txt'  #MAIN RESULT FOR B_ext AT PI/2
-    inFileName = 'biaxial_island_shape_field_external.out/tableExt_K0.1Ms2_Bext0.00015_a3Pi8_50x45_3.125nm.txt'  #For asymmetric test
+    # inFileName = 'biaxial_island_shape_field_external.out/tableExt_K0.1Ms2_Bext0.00015_a3Pi8_50x45_3.125nm.txt'  #For asymmetric test
     outDir1 = 'Figures/BarrierLandscape'
     if not os.path.exists(outDir1):
         os.makedirs(outDir1)
@@ -48,7 +48,9 @@ if __name__ == "__main__":
     legend = []
     fields, E_min, E_max = [], [], []
     ELECTRONVOLT_FACTOR = 1.602e-19 if USE_ELECTRONVOLT else 1
-    for subset in shape.groupby("Field_ext", sort=False):
+    for i, subset in enumerate(shape.groupby("Field_ext", sort=False)):
+        if i not in [0, 1, 2, 5]:
+            continue
         field = subset[0]
         subtable = subset[1]
         E_demag = subtable["E_total"]
@@ -59,7 +61,7 @@ if __name__ == "__main__":
         E_demag /= ELECTRONVOLT_FACTOR
         diff = max(E_demag) - min(E_demag)
         print("(%.3f T) Delta E: %.2e %s" % (field, diff, 'eV' if USE_ELECTRONVOLT else 'J'))
-        legend.append('%.4f T' % field)
+        legend.append('%.2f mT' % (field*1e3))
         # legend.append(('%.1f T' % (field)) if field > 1 else ('%d mT' % (field*1e3)))
 
         if USE_RELAXED_ANGLE:
@@ -83,13 +85,11 @@ if __name__ == "__main__":
 
     plt.grid(color='grey', linestyle=':', linewidth=1)
     plt.legend(legend)
-    # plt.xlim([0,90])
+    # plt.xlim([0,360])
     if SUBTRACT_ZEEMAN:
         plt.ylim([8.1e-19/ELECTRONVOLT_FACTOR, 8.8e-19/ELECTRONVOLT_FACTOR])
     plt.xlabel(r"Relaxed magnetization angle $\theta$ [°]" if USE_RELAXED_ANGLE else r"External magnetic field angle $\theta$ [°]")
     plt.ylabel(r"Energy [%s]" % ('eV' if USE_ELECTRONVOLT else 'J'))
-    # plt.title(r"65x100 nm double-ellipse")
-    plt.title(r"50x45 nm double-ellipse")
 
     # Show plot
     plt.gcf().tight_layout()

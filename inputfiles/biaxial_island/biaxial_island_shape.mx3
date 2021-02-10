@@ -1,5 +1,5 @@
 //// Grid
-Nxy := 32
+Nxy := 128
 Nz := 1
 cellSize := 100e-9/Nxy
 SetGridSize(Nxy, Nxy, Nz)
@@ -26,7 +26,7 @@ size0 := size
 
 //// Loop total size and shape
 for size=size0; size >= 100; size = size*0.5 {
-    for roundness=roundness0; (roundness >= 0.1) && (roundness*size > 128/Nxy); roundness -= 0.01 {
+    for roundness=roundness0; (roundness >= 0.1) && (roundness*size > 128/Nxy); roundness -= 0.1 {
         print(sprintf("Short axis: %.2f nm", roundness*size))
         print(sprintf("Long axis: %d nm", size))
 
@@ -43,7 +43,7 @@ for size=size0; size >= 100; size = size*0.5 {
             minimize()
             
             TableSave()
-            //SaveAs(m, sprintf("mPlus_l%d_%.2f_a%.2f.ovf", size, roundness, angle))
+            SaveAs(m, sprintf("mPlus_roundness%.2f_a%.2f.ovf", roundness, angle))
         }
     }
 }

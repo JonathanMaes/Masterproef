@@ -74,7 +74,6 @@ if __name__ == "__main__":
     plt.ylim([8.1e-19/ELECTRONVOLT_FACTOR, 8.8e-19/ELECTRONVOLT_FACTOR])
     plt.xlabel(r"Relaxed magnetization angle $\theta$ [°]" if USE_RELAXED_ANGLE else r"External magnetic field angle $\theta$ [°]")
     plt.ylabel(r"Energy [%s]" % ('eV' if USE_ELECTRONVOLT else 'J'))
-    plt.title(r"65x100 nm double-ellipse")
 
     # Show plot
     plt.gcf().tight_layout()

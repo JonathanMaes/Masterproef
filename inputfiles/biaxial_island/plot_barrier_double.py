@@ -9,7 +9,7 @@ import pandas as pd
 
 font = {'size':16}
 matplotlib.rc('font', **font)
-matplotlib.rcParams['axes.prop_cycle'] = matplotlib.cycler(color=["b", "y", "r", "lightblue"]) 
+matplotlib.rcParams['axes.prop_cycle'] = matplotlib.cycler(color=["b", "y", "r", "lightgreen"]) 
 
 
 def read_mumax3_table(filename):
@@ -21,7 +21,8 @@ def read_mumax3_table(filename):
     return table
 
 if __name__ == "__main__":
-    inFileName = 'biaxial_island_shape.out/tablePlus_100_0.1-1_aPi4_B0.001.txt'
+    inFileName = 'biaxial_island_shape.out/tablePlus_100_0.1-1_aPi4_B0.001.txt' #! set GROUP_BY to "Cell_size" for this one
+    # inFileName = 'biaxial_island_shape.out/tablePlus_32-128_0.1-1_aPi4_B0.001_cell1nm.txt'
     # inFileName = 'biaxial_island_shape.out/tablePlus_100_0.1-1_aPi4_B0.001_cell3.125nm.txt'
     outDir = 'Figures/Barrier'
     if not os.path.exists(outDir):
@@ -61,9 +62,9 @@ if __name__ == "__main__":
         plt.plot(roundnesses, E_barrier)
 
     plt.grid(color='grey', linestyle=':', linewidth=1)
-    plt.xlabel(r'Roundness')
+    plt.xlabel(r'Roundness $\rho$')
     plt.ylabel(r'Energy barrier [%s]' % ('eV' if USE_ELECTRONVOLT else 'J'))
     plt.legend(legend)
     plt.gcf().tight_layout()
-    plt.savefig(outFileName)
+    # plt.savefig(outFileName)
     plt.show()

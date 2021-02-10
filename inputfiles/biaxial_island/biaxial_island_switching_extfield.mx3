@@ -11,13 +11,13 @@ Aex = 13e-12
 print("Exchange length:", Sqrt((2*Aex.GetRegion(0))/(mu0*Pow(Msat.GetRegion(0), 2)))) // 5.6858e-9 so ok to use Nz = 1 for 5e-9 thickness
 
 //// Custom quantities
-external := 0.00015
+external := 0.0005
 externalAngle := 3*Pi/8
 
 //// Track E_total, angle, shape
 TableAdd(E_total)
 TableAdd(E_zeeman)
-roundness := 0.9
+roundness := 0.8
 size := 50
 TableAddVar(roundness, "Roundness", "")
 TableAddVar(size, "Size", "nm")
@@ -30,7 +30,7 @@ TableAutoSave(1e-11)
 
 //// Temperature
 alpha = 0.01 // If zero, temperature fluctuations are zero too
-Temp = 300
+Temp = 100
 Thermseed(12345)
 setsolver(5)
 fixdt = 0 // Default
@@ -47,4 +47,4 @@ SaveAs(geom, sprintf("geomPlus%d_%.2f.ovf", size, roundness))
 
 //// Run simulation
 relax()
-Run(1e-5)
+Run(1e-8)
