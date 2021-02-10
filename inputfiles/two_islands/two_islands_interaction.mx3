@@ -1,0 +1,90 @@
+/*
+    Calculates the energy landscape between two ellipse-plus-shaped islands, for all possible values of
+    their magnetization angles.
+*/
+//// Grid
+Nxy := 64
+Nz := 1
+cellSize := 4e-9
+SetGridSize(Nxy, Nxy, Nz)
+SetCellSize(cellSize, cellSize, 5e-9/Nz)
+L := cellSize*Nxy
+print("Grid size:", L)
+
+//// Material parameters
+Ms := 800e3
+Msat = Ms
+Aex = 13e-12
+print("Exchange length:", Sqrt((2*Aex.GetRegion(0))/(mu0*Pow(Msat.GetRegion(0), 2)))) // 5.6858e-9 so ok to use Nz = 1 for 5e-9 thickness
+
+//// Custom quantities
+island1_magAngle := 0.0 // Sweep: magnetization angle of island 1
+island1_magAngle0 := island1_magAngle
+island2_magAngle := 0.0 // Sweep: magnetization angle of island 2
+island2_magAngle0 := island2_magAngle
+bias := 0.1 // Magnitude of the custom bias field to control the magnetization angle (0.1T = good)
+
+//// Shape and regions
+island_roundness := 0.66 // Roundness of the ellipses that the islands are made of
+island_size := 100e-9 // Long axis of the ellipses that the islands are made of
+islands_distance := 128e-9 // Distance between the center of the two islands
+islands_angle := 0 // Angle between the two islands (0° = along each other's axes, 90° = again along each other's axes, 45° = along diagonal...)
+
+island1 := Ellipse(island_size, island_size*island_roundness)
+island1 = island1.Add(island1.RotZ(Pi/2))
+island1 = island1.Transl(-L/2+island_size/2, -L/2+island_size/2, 0)
+island2 := island1.Transl(cos(islands_angle)*islands_distance, sin(islands_angle)*islands_distance, 0)
+geometry := island1.Add(island2)
+SetGeom(geometry)
+Save(Geom)
+
+DefRegion(1, island1)
+DefRegion(2, island2)
+
+//// Track E_total, angle, shape
+// Use Quantity.Region(int) to get the quantity in one region
+TableAdd(E_total) // Total energy
+TableAdd(E_zeeman) // Bias field
+TableAddVar(island1_magAngle, "island1_angle", "rad")
+TableAddVar(island2_magAngle, "island2_angle", "rad")
+TableAddVar(island_roundness, "roundness", "")
+TableAddVar(island_size, "size", "m")
+TableAddVar(islands_distance, "islands_distance", "m")
+TableAddVar(islands_angle, "islands_angle", "rad")
+TableAddVar(cellSize, "Cell_size", "m")
+
+//// Initialize loop variables
+u1 := Vector(1, 0, 0)
+u2 := Vector(1, 0, 0)
+//anisField1 := ConstVector(1, 0, 0)
+//anisField2 := ConstVector(1, 0, 0)
+//anisField := ConstVector(1, 0, 0)
+//anisEdens := Const(1)
+
+//// Sweep magnetization angle island 1
+for island1_magAngle=island1_magAngle0; island1_magAngle <= 2*Pi; island1_magAngle += Pi/32 {
+    //// Sweep magnetization angle island 2
+    for island2_magAngle=island2_magAngle0; island2_magAngle <= 2*Pi; island2_magAngle += Pi/32 {
+        //// Custom field (to keep average magnetization in certain direction)
+        //RemoveCustomFields()
+        //RemoveCustomEnergies()
+        u1 = Vector(cos(island1_magAngle), sin(island1_magAngle), 0)
+        u2 = Vector(cos(island2_magAngle), sin(island2_magAngle), 0)
+        //anisField1 = Masked(Mul( Const(bias)  , Mul( Dot(u1, m), u1)), island1)
+        //anisField2 = Masked(Mul( Const(bias)  , Mul( Dot(u2, m), u2)), island2)
+        //anisField = Add(anisField1, anisField2)
+        //anisEdens = Mul( Const(-0.5*Ms) , Dot( anisField, m))
+        //AddFieldTerm(anisField) // promote anisField to an effective field term
+        //AddEdensTerm(anisEdens) // promote anisEdens to an effective energy term
+
+        //// Magnetization and external field
+        m.setRegion(1, Uniform(1, 0, 0).rotZ(island1_magAngle))
+        m.setRegion(2, Uniform(1, 0, 0).rotZ(island2_magAngle))
+        B_ext.setRegion(1, u1.Mul(bias))
+        B_ext.setRegion(2, u2.Mul(bias))
+        minimize()
+        
+        TableSave()
+        //SaveAs(m, sprintf("mTwoIslands_a%.3f_a%.3f.ovf", island1_magAngle, island2_magAngle))
+    }
+}

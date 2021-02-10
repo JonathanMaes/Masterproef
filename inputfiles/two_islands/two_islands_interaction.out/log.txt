@@ -1,0 +1,75 @@
+//mumax 3.10 [windows_amd64 go1.11.6(gc) CUDA-11.0]
+//GPU info: GeForce MX150(2048MB), CUDA Driver 11.1, cc=6.1, using cc=61 PTX
+//(c) Arne Vansteenkiste, Dynamat LAB, Ghent University, Belgium
+//This is free software without any warranty. See license.txt
+//********************************************************************//
+//  If you use mumax in any work or publication,                      //
+//  we kindly ask you to cite the references in references.bib        //
+//********************************************************************//
+//output directory: c:\Jonathan\UGent\Masterproef\inputfiles\two_islands\two_islands_interaction.out/
+Nxy := 128
+Nz := 1
+cellSize := 2e-9
+SetGridSize(Nxy, Nxy, Nz)
+SetCellSize(cellSize, cellSize, 5e-9/Nz)
+L := cellSize * Nxy
+print("Grid size:", L)
+//Grid size: 2.56e-07
+Ms := 800e3
+Msat = Ms
+Aex = 13e-12
+print("Exchange length:", Sqrt((2*Aex.GetRegion(0))/(mu0*Pow(Msat.GetRegion(0), 2))))
+//Exchange length: 5.685802385313737e-09
+island1_magAngle := 0.0
+island1_magAngle0 := island1_magAngle
+island2_magAngle := 0.0
+island2_magAngle0 := island2_magAngle
+bias := 0.1
+island_roundness := 0.65
+island_size := 100e-9
+islands_distance := 128e-9
+islands_angle := 0
+island1 := Ellipse(island_size, island_size*island_roundness)
+island1 = island1.Add(island1.RotZ(Pi / 2))
+island1 = island1.Transl(-L/2+island_size/2, -L/2+island_size/2, 0)
+island2 := island1.Transl(cos(islands_angle)*islands_distance, sin(islands_angle)*islands_distance, 0)
+geometry := island1.Add(island2)
+SetGeom(geometry)
+Save(Geom)
+DefRegion(1, island1)
+DefRegion(2, island2)
+TableAdd(E_total)
+TableAdd(E_custom)
+TableAddVar(island1_magAngle, "island1_angle", "rad")
+TableAddVar(island2_magAngle, "island2_angle", "rad")
+u1 := ConstVector(1, 0, 0)
+u2 := ConstVector(1, 0, 0)
+anisField1 := ConstVector(1, 0, 0)
+anisField2 := ConstVector(1, 0, 0)
+anisField := ConstVector(1, 0, 0)
+anisEdens := Const(1)
+n := 8.0
+for island1_magAngle = island1_magAngle0; island1_magAngle < 2*Pi; island1_magAngle += Pi / 8 {
+	for island2_magAngle = island2_magAngle0; island2_magAngle < 2*Pi; island2_magAngle += Pi / 8 {
+		RemoveCustomFields()
+		u1 = ConstVector(cos(island1_magAngle), sin(island1_magAngle), 0)
+		u2 = ConstVector(cos(island2_magAngle), sin(island2_magAngle), 0)
+		anisField1 = Masked(Mul(Const(bias), Mul(Dot(u1, m), u1)), island1)
+		anisField2 = Masked(Mul(Const(bias), Mul(Dot(u2, m), u2)), island2)
+		anisField = Add(anisField1, anisField2)
+		anisEdens = Mul(Const(-0.5*Ms), Dot(anisField, m))
+		AddFieldTerm(anisField)
+		AddEdensTerm(anisEdens)
+		m.setRegion(1, Uniform(1, 0, 0).rotZ(island1_magAngle))
+		m.setRegion(2, Uniform(1, 0, 0).rotZ(island2_magAngle))
+		minimize()
+		TableSave()
+		SaveAs(m, sprintf("mTwoIslands_a%.3f_a%.3f.ovf", island1_magAngle, island2_magAngle))
+	}
+}
+//********************************************************************//
+//Please cite the following references, relevant for your simulation. //
+//See bibtex file in output folder for justification.                 //
+//********************************************************************//
+//   * Vansteenkiste et al., AIP Adv. 4, 107133 (2014).
+//   * Exl et al., J. Appl. Phys. 115, 17D118 (2014).
