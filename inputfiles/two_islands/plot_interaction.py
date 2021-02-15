@@ -1,8 +1,5 @@
 """
-    PLOTS: - 'Relaxed magnetization angle' AS FUNCTION OF 'Time'
-    Variable 'fancy': if True, angles are plotted in a continuous manner past [-180°, 180°].
-                      if False, angles are constrained to [-180°, 180°].
-    Variable 'groupBy': can be used to group by occurences of one table column (doesn't work entirely).
+    PLOTS: - 'Total energy' AS 2D FUNCTION OF 'External field angle island 1' and 'External field angle island 2'
 """
 import math
 import matplotlib
