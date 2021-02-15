@@ -22,6 +22,7 @@ def read_mumax3_table(filename):
 
 if __name__ == "__main__":
     inFileName = 'biaxial_island_shape.out/tablePlus_100_0.1-1_aPi4_B0.001.txt' #! set GROUP_BY to "Cell_size" for this one
+    inFileName = 'biaxial_island_shape.out/tablePlus_100_0.1-1.txt' #! set GROUP_BY to "Cell_size" for this one
     # inFileName = 'biaxial_island_shape.out/tablePlus_32-128_0.1-1_aPi4_B0.001_cell1nm.txt'
     # inFileName = 'biaxial_island_shape.out/tablePlus_100_0.1-1_aPi4_B0.001_cell3.125nm.txt'
     outDir = 'Figures/Barrier'
@@ -37,6 +38,7 @@ if __name__ == "__main__":
     # GROUP_BY = "Size"
     GROUP_BY = "Cell_size"
     USE_ABSOLUTE_VALUE = False
+    PLOT_AS_SCATTER = True
     for subset in shape.groupby(GROUP_BY, sort=False):
         size = subset[0]
         subtable = subset[1]
@@ -59,7 +61,10 @@ if __name__ == "__main__":
             legend.append('%s nm' % size)
         elif GROUP_BY == "Cell_size":
             legend.append('%s nm' % (size*1e9))
-        plt.plot(roundnesses, E_barrier)
+        if PLOT_AS_SCATTER:
+            plt.scatter(roundnesses, E_barrier)
+        else:
+            plt.plot(roundnesses, E_barrier)
 
     plt.grid(color='grey', linestyle=':', linewidth=1)
     plt.xlabel(r'Roundness $\rho$')
