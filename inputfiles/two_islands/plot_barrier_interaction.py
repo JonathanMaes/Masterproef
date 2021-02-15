@@ -25,10 +25,11 @@ def read_mumax3_table(filename):
     return table
 
 if __name__ == "__main__":
-    inFileName = 'two_islands_interaction.out/tableInt_a0Pi,0Pi_d128_r0.66,0.66.txt'
-    # inFileName = 'two_islands_interaction.out/tableInt_a0Pi,0Pi_d128_r0.49,0.49.txt'
+    # inFileName = 'two_islands_interaction.out/tableInt_a0Pi,0Pi_d128_r0.66,0.66_cell4nm.txt'
+    # inFileName = 'two_islands_interaction.out/tableInt_a0Pi,0Pi_d128_r0.49,0.49_cell4nm.txt'
+    inFileName = 'two_islands_interaction.out/tableInt_a0Pi,0Pi_d128_r0.81,0.81_cell4nm.txt'
     # inFileName = 'two_islands_interaction_noCustomField.out/table.txt'
-    outDir = 'Figures/Switching'
+    outDir = 'Figures/EnergyLandscape'
     if not os.path.exists(outDir):
         os.makedirs(outDir)
     outFileName = os.path.join(outDir, os.path.splitext(os.path.basename(inFileName).split('table')[-1])[0]) + '.pdf'
