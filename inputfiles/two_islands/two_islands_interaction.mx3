@@ -25,14 +25,14 @@ island2_magAngle0 := island2_magAngle
 bias := 0.1 // Magnitude of the custom bias field to control the magnetization angle (0.1T = good)
 
 //// Shape and regions
-island_roundness := 0.66 // Roundness of the ellipses that the islands are made of
+island_roundness := 0.81 // Roundness of the ellipses that the islands are made of
 island_size := 100e-9 // Long axis of the ellipses that the islands are made of
 islands_distance := 128e-9 // Distance between the center of the two islands
 islands_angle := 0 // Angle between the two islands (0° = along each other's axes, 90° = again along each other's axes, 45° = along diagonal...)
 
 island1 := Ellipse(island_size, island_size*island_roundness)
 island1 = island1.Add(island1.RotZ(Pi/2))
-island1 = island1.Transl(-L/2+island_size/2, -L/2+island_size/2, 0)
+island1 = island1.Transl(-L/2+island_size/2, -L/2+island_size/2, 0) // Shuffle to the corner
 island2 := island1.Transl(cos(islands_angle)*islands_distance, sin(islands_angle)*islands_distance, 0)
 geometry := island1.Add(island2)
 SetGeom(geometry)
@@ -56,26 +56,14 @@ TableAddVar(cellSize, "Cell_size", "m")
 //// Initialize loop variables
 u1 := Vector(1, 0, 0)
 u2 := Vector(1, 0, 0)
-//anisField1 := ConstVector(1, 0, 0)
-//anisField2 := ConstVector(1, 0, 0)
-//anisField := ConstVector(1, 0, 0)
-//anisEdens := Const(1)
 
 //// Sweep magnetization angle island 1
 for island1_magAngle=island1_magAngle0; island1_magAngle <= 2*Pi; island1_magAngle += Pi/32 {
     //// Sweep magnetization angle island 2
     for island2_magAngle=island2_magAngle0; island2_magAngle <= 2*Pi; island2_magAngle += Pi/32 {
         //// Custom field (to keep average magnetization in certain direction)
-        //RemoveCustomFields()
-        //RemoveCustomEnergies()
         u1 = Vector(cos(island1_magAngle), sin(island1_magAngle), 0)
         u2 = Vector(cos(island2_magAngle), sin(island2_magAngle), 0)
-        //anisField1 = Masked(Mul( Const(bias)  , Mul( Dot(u1, m), u1)), island1)
-        //anisField2 = Masked(Mul( Const(bias)  , Mul( Dot(u2, m), u2)), island2)
-        //anisField = Add(anisField1, anisField2)
-        //anisEdens = Mul( Const(-0.5*Ms) , Dot( anisField, m))
-        //AddFieldTerm(anisField) // promote anisField to an effective field term
-        //AddEdensTerm(anisEdens) // promote anisEdens to an effective energy term
 
         //// Magnetization and external field
         m.setRegion(1, Uniform(1, 0, 0).rotZ(island1_magAngle))
