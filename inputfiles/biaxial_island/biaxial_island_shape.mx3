@@ -34,6 +34,7 @@ for size=size0; size >= 100; size = size*0.5 {
         geometry := Ellipse(size*1e-9, size*roundness*1e-9)
         geometry = geometry.Add(geometry.RotZ(Pi/2))
         SetGeom(geometry)
+        print(sprintf("Volume: %.3e m³", geom.average()*Nxy*Nxy*Nz*(cellSize*cellSize*cellSize)))
         //SaveAs(geom, sprintf("geomPlus%d_%.2f", size, roundness))
 
         //// Sweep magnetization angle
