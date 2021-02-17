@@ -1,9 +1,10 @@
 //// Grid
-Nxy := 32
+Nxy := 256
 Nz := 1
-cellSize := 4e-9
+cellSize := 0.5e-9
+thickness := 5e-9
 SetGridSize(Nxy, Nxy, Nz)
-SetCellSize(cellSize, cellSize, 5e-9/Nz)
+SetCellSize(cellSize, cellSize, thickness/Nz)
 
 //// Material parameters
 Msat = 800e3
@@ -16,10 +17,12 @@ TableAdd(E_zeeman)
 angle := 0.0
 roundness := 1.0
 size := 100 // [nm]
+volume := 0.0 // [m³]
 TableAddVar(angle, "Angle", "rad")
 TableAddVar(roundness, "Roundness", "")
 TableAddVar(size, "Size", "nm")
 TableAddVar(cellSize, "Cell_size", "m")
+TableAddVar(volume, "Volume", "m^3")
 angle0 := angle
 roundness0 := roundness
 size0 := size
@@ -34,7 +37,8 @@ for size=size0; size >= 100; size = size*0.5 {
         geometry := Ellipse(size*1e-9, size*roundness*1e-9)
         geometry = geometry.Add(geometry.RotZ(Pi/2))
         SetGeom(geometry)
-        print(sprintf("Volume: %.3e m³", geom.average()*Nxy*Nxy*Nz*(cellSize*cellSize*cellSize)))
+        volume = geom.average()*Pow(cellSize*Nxy, 2)*thickness
+        print(sprintf("Volume: %.3e m³", volume))
         //SaveAs(geom, sprintf("geomPlus%d_%.2f", size, roundness))
 
         //// Sweep magnetization angle
