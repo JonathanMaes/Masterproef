@@ -38,7 +38,7 @@ if __name__ == "__main__":
     # GROUP_BY = "Size"
     GROUP_BY = "Cell_size"
     USE_ABSOLUTE_VALUE = False
-    PLOT_AS_SCATTER = True
+    PLOT_AS_SCATTER = False
     for subset in shape.groupby(GROUP_BY, sort=False):
         size = subset[0]
         subtable = subset[1]
