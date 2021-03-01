@@ -24,30 +24,27 @@ def read_mumax3_table(filename):
 if __name__ == "__main__":
     # inFileName = 'two_islands_interaction.out/tableInt_a0Pi,0Pi_d128_r0.66,0.66_cell4nm.txt'
     # inFileName = 'two_islands_interaction.out/tableInt_a0Pi,0Pi_d128_r0.49,0.49_cell4nm.txt'
-    inFileName = 'two_islands_interaction.out/tableInt_a0Pi,0Pi_d128_r0.81,0.81_cell4nm.txt'
+    # inFileName = 'two_islands_interaction.out/tableInt_a0Pi,0Pi_d128_r0.81,0.81_cell4nm.txt'
+    # inFileName = 'two_islands_interaction.out/tableInt_a0Pi,0Pi_d128_r0.66,0.66_cell1nm.txt'
+    inFileName = 'two_islands_interaction.out/tableInt_a0Pi,Pi4_d128_r0.66,0.66_cell1nm.txt'
     # inFileName = 'two_islands_interaction_noCustomField.out/table.txt'
-    outDir = 'Figures/EnergyLandscape'
-    if not os.path.exists(outDir):
-        os.makedirs(outDir)
-    outFileName = os.path.join(outDir, os.path.splitext(os.path.basename(inFileName).split('table')[-1])[0]) + '.pdf'
-
     table = read_mumax3_table(inFileName)
 
     fig = plt.figure(figsize=(7.0, 5.0))
     legend = []
     USE_ELECTRONVOLT = True
     USE_ABSOLUTE_VALUE = False
-    WRAP_EDGES = True
+    WRAP_EDGES = not (table['island2_magAngle'].sub(6.2831855).abs().min() < 1e-5)
     INTERPOLATE_PIXELS = True
     Energy = []
     if WRAP_EDGES:
         lim_1 = [0, 360]
         lim_2 = lim_1
     else:
-        lim_1 = np.array([min(table["island1_angle"]), max(table["island1_angle"])])*180/np.pi
-        lim_2 = np.array([min(table["island2_angle"]), max(table["island2_angle"])])*180/np.pi
+        lim_1 = np.array([min(table["island1_magAngle"]), max(table["island1_magAngle"])])*180/np.pi
+        lim_2 = np.array([min(table["island2_magAngle"]), max(table["island2_magAngle"])])*180/np.pi
 
-    for subset in table.groupby("island1_angle", sort=True):
+    for subset in table.groupby("island1_magAngle", sort=True):
         island1_angle = subset[0]
         subtable = subset[1]
         if "E_Zeeman" in subtable.columns:
@@ -76,7 +73,17 @@ if __name__ == "__main__":
 
     plt.gcf().subplots_adjust(bottom=0.15, left=0.15, right=0.95)
     plt.gcf().tight_layout()
+
+    #### Save plot
+    if INTERPOLATE_PIXELS:
+        outDir = 'Figures/EnergyLandscape'
+    else:
+        outDir = 'Figures/EnergyLandscape/Pixelated'
+    if not os.path.exists(outDir):
+        os.makedirs(outDir)
+    outFileName = os.path.join(outDir, os.path.splitext(os.path.basename(inFileName).split('table')[-1])[0]) + '.pdf'
     plt.savefig(outFileName)
 
+    #### Show plot
     plt.show()
     
