@@ -3,13 +3,15 @@
     their magnetization angles.
 */
 //// Grid
-Nxy := 64
+Nx := 256
+Ny := 128
 Nz := 1
-cellSize := 4e-9
-SetGridSize(Nxy, Nxy, Nz)
+cellSize := 1e-9
+SetGridSize(Nx, Ny, Nz)
 SetCellSize(cellSize, cellSize, 5e-9/Nz)
-L := cellSize*Nxy
-print("Grid size:", L)
+Lx := cellSize*Nx
+Ly := cellSize*Ny
+print("Simulation area:", Lx, "by", Ly)
 
 //// Material parameters
 Ms := 800e3
@@ -25,15 +27,18 @@ island2_magAngle0 := island2_magAngle
 bias := 0.1 // Magnitude of the custom bias field to control the magnetization angle (0.1T = good)
 
 //// Shape and regions
-island_roundness := 0.81 // Roundness of the ellipses that the islands are made of
+island_roundness := 0.66 // Roundness of the ellipses that the islands are made of
 island_size := 100e-9 // Long axis of the ellipses that the islands are made of
 islands_distance := 128e-9 // Distance between the center of the two islands
-islands_angle := 0 // Angle between the two islands (0° = along each other's axes, 90° = again along each other's axes, 45° = along diagonal...)
+island1_angle := 0 // Rotation of island 1 geometry
+island2_angle := Pi/4 // Rotation of island 2 geometry
 
 island1 := Ellipse(island_size, island_size*island_roundness)
 island1 = island1.Add(island1.RotZ(Pi/2))
-island1 = island1.Transl(-L/2+island_size/2, -L/2+island_size/2, 0) // Shuffle to the corner
-island2 := island1.Transl(cos(islands_angle)*islands_distance, sin(islands_angle)*islands_distance, 0)
+island2 := island1.RotZ(island2_angle)
+island1 = island1.RotZ(island1_angle)
+island1 = island1.Transl(-Lx/2+island_size/2, -Ly/2+island_size/2, 0) // Shuffle to the corner
+island2 = island2.Transl(-Lx/2+island_size/2+islands_distance, -Ly/2+island_size/2, 0)
 geometry := island1.Add(island2)
 SetGeom(geometry)
 Save(Geom)
@@ -45,12 +50,13 @@ DefRegion(2, island2)
 // Use Quantity.Region(int) to get the quantity in one region
 TableAdd(E_total) // Total energy
 TableAdd(E_zeeman) // Bias field
-TableAddVar(island1_magAngle, "island1_angle", "rad")
-TableAddVar(island2_magAngle, "island2_angle", "rad")
+TableAddVar(island1_magAngle, "island1_magAngle", "rad")
+TableAddVar(island2_magAngle, "island2_magAngle", "rad")
 TableAddVar(island_roundness, "roundness", "")
 TableAddVar(island_size, "size", "m")
 TableAddVar(islands_distance, "islands_distance", "m")
-TableAddVar(islands_angle, "islands_angle", "rad")
+TableAddVar(island1_angle, "island1_angle", "rad")
+TableAddVar(island2_angle, "island2_angle", "rad")
 TableAddVar(cellSize, "Cell_size", "m")
 
 //// Initialize loop variables
