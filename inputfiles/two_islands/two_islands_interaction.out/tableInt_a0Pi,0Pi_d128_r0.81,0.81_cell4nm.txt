@@ -1,4 +1,4 @@
-# t (s)	mx ()	my ()	mz ()	E_total (J)	E_Zeeman (J)	island1_angle (rad)	island2_angle (rad)	roundness ()	size (m)	islands_distance (m)	islands_angle (rad)	Cell_size (m)
+# t (s)	mx ()	my ()	mz ()	E_total (J)	E_Zeeman (J)	island1_magAngle (rad)	island2_magAngle (rad)	roundness ()	size (m)	islands_distance (m)	islands_angle (rad)	Cell_size (m)
 0	0.9980888	-3.0411897e-09	0	-4.030292e-18	-5.787317e-18	0	0	0.81	1e-07	1.28e-07	0	4e-09
 0	0.9959152	0.045827758	0	-4.02963e-18	-5.787331e-18	0	0.09817477	0.81	1e-07	1.28e-07	0	4e-09
 0	0.989398	0.09133562	0	-4.027669e-18	-5.7873745e-18	0	0.19634955	0.81	1e-07	1.28e-07	0	4e-09
