@@ -30,7 +30,7 @@ bias := 0.1 // Magnitude of the custom bias field to control the magnetization a
 island_roundness := 0.66 // Roundness of the ellipses that the islands are made of
 island_size := 100e-9 // Long axis of the ellipses that the islands are made of
 islands_distance := 128e-9 // Distance between the center of the two islands
-island1_angle := 0 // Rotation of island 1 geometry
+island1_angle := Pi/4 // Rotation of island 1 geometry
 island2_angle := Pi/4 // Rotation of island 2 geometry
 
 island1 := Ellipse(island_size, island_size*island_roundness)

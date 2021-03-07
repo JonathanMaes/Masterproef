@@ -26,7 +26,10 @@ if __name__ == "__main__":
     # inFileName = 'two_islands_interaction.out/tableInt_a0Pi,0Pi_d128_r0.49,0.49_cell4nm.txt'
     # inFileName = 'two_islands_interaction.out/tableInt_a0Pi,0Pi_d128_r0.81,0.81_cell4nm.txt'
     # inFileName = 'two_islands_interaction.out/tableInt_a0Pi,0Pi_d128_r0.66,0.66_cell1nm.txt'
-    inFileName = 'two_islands_interaction.out/tableInt_a0Pi,Pi4_d128_r0.66,0.66_cell1nm.txt'
+    # inFileName = 'two_islands_interaction.out/tableInt_a0Pi,Pi4_d128_r0.66,0.66_cell1nm.txt'
+    inFileName = 'two_islands_interaction.out/tableInt_aPi4,Pi4_d128_r0.66,0.66_cell1nm.txt'
+    # inFileName = 'two_islands_interaction_extField.out/table_Ext0.5-3Pi4_a0Pi,Pi4_d128_r0.66,0.66_cell1nm.txt'
+    # inFileName = 'two_islands_interaction_extField.out/table.txt'
     # inFileName = 'two_islands_interaction_noCustomField.out/table.txt'
     table = read_mumax3_table(inFileName)
 
@@ -60,7 +63,7 @@ if __name__ == "__main__":
 
     ax = fig.add_subplot(111)
     interpolation = 'gaussian' if INTERPOLATE_PIXELS else 'nearest'
-    im = ax.imshow(Energy[::-1], extent=[lim_1[0], lim_1[1], lim_2[0], lim_2[1]], interpolation=interpolation, cmap=cm.get_cmap('inferno'))
+    im = ax.imshow(Energy[::-1], vmin=0, vmax=min(4, np.max(Energy)), extent=[lim_2[0], lim_2[1], lim_1[0], lim_1[1]], interpolation=interpolation, cmap=cm.get_cmap('inferno'))
     # ax.set_aspect('auto')
     plt.xlabel("Island 2 magnetization angle [°]")
     plt.ylabel("Island 1 magnetization angle [°]")
@@ -82,7 +85,7 @@ if __name__ == "__main__":
     if not os.path.exists(outDir):
         os.makedirs(outDir)
     outFileName = os.path.join(outDir, os.path.splitext(os.path.basename(inFileName).split('table')[-1])[0]) + '.pdf'
-    plt.savefig(outFileName)
+    # plt.savefig(outFileName)
 
     #### Show plot
     plt.show()
