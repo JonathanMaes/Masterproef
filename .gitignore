@@ -6,5 +6,4 @@ Presentations/
 inputfiles/**/*.out/*
 !inputfiles/**/*.out/*.ovf
 !inputfiles/**/*.out/*.txt
-inputfiles/test
 inputfiles/biaxial_island/biaxial_island_switching_extfield.out/
