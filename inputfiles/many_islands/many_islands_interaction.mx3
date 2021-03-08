@@ -1,0 +1,80 @@
+/*
+    Calculates the energy landscape between two ellipse-plus-shaped islands, for all possible values of
+    their magnetization angles.
+*/
+//// Grid
+Nx := 256
+Ny := 256
+Nz := 1
+cellSize := 2e-9
+SetGridSize(Nx, Ny, Nz)
+SetCellSize(cellSize, cellSize, 5e-9/Nz)
+Lx := cellSize*Nx
+Ly := cellSize*Ny
+print("Simulation area:", Lx, "by", Ly)
+
+//// Material parameters
+Msat = 800e3
+Aex = 13e-12
+print("Exchange length:", Sqrt((2*Aex.GetRegion(0))/(mu0*Pow(Msat.GetRegion(0), 2)))) // 5.6858e-9 so ok to use Nz = 1 for 5e-9 thickness
+
+//// Base geometry
+island_roundness := 0.66 // Roundness of the ellipses that the islands are made of
+island_size := 100e-9 // Long axis of the ellipses that the islands are made of
+island := Ellipse(island_size, island_size*island_roundness)
+island = island.Add(island.RotZ(Pi/2))
+
+//// Island geometries
+angle1 := Pi/4 // angle{n} is initial orientation of all islands
+angle2 := 0.0
+angle3 := Pi/4
+angle4 := -Pi/2 // angle{n} of a fixed island is the fixed direction
+
+a1 := angle1 // a{n} only of free moving islands
+a2 := angle2
+a3 := angle3
+
+island1 := island.RotZ(angle1).Transl(-90e-9, -90e-9, 0)
+island2 := island.RotZ(angle2).Transl(0, 0, 0)
+island3 := island.RotZ(angle3).Transl(90e-9, -90e-9, 0)
+island4 := island.RotZ(angle4).Transl(0, 128e-9, 0)
+geometry := island1.Add(island2).Add(island3).Add(island4)
+SetGeom(geometry)
+
+DefRegion(1, island1)
+DefRegion(2, island2)
+DefRegion(3, island3)
+DefRegion(4, island4)
+Save(regions)
+
+B_ext.setRegion(4, Vector(cos(angle4), sin(angle4), 0).Mul(1))
+
+//// Track E_total, angle, shape
+// Use Quantity.Region(int) to get the quantity in one region
+TableAdd(E_total) // Total energy
+TableAdd(E_Zeeman) // Zeeman only takes into account B_ext, and thus the fixation of the fixed islands (to be subtracted from E_total)
+TableAddVar(a1, "a1", "rad")
+TableAddVar(a2, "a2", "rad")
+TableAddVar(a3, "a3", "rad")
+TableAdd(m.Region(1))
+TableAdd(m.Region(2))
+TableAdd(m.Region(3))
+TableAdd(m.Region(4))
+TableAddVar(island_roundness, "roundness", "")
+TableAddVar(island_size, "size", "m")
+TableAddVar(cellSize, "Cell_size", "m")
+
+//// Many nested loops
+for a1=angle1; a1 < 2*Pi; a1 += Pi/2 {
+for a2=angle2; a2 < 2*Pi; a2 += Pi/2 {
+for a3=angle3; a3 < 2*Pi; a3 += Pi/2 {
+    m.setRegion(1, Uniform(1, 0, 0).rotZ(a1))
+    m.setRegion(2, Uniform(1, 0, 0).rotZ(a2))
+    m.setRegion(3, Uniform(1, 0, 0).rotZ(a3))
+    
+    minimize()
+    TableSave()
+}
+}
+}
+
