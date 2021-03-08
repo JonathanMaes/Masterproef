@@ -48,6 +48,7 @@ DefRegion(4, island4)
 Save(regions)
 
 B_ext.setRegion(4, Vector(cos(angle4), sin(angle4), 0).Mul(1))
+Save(B_ext)
 
 //// Track E_total, angle, shape
 // Use Quantity.Region(int) to get the quantity in one region

@@ -76,5 +76,5 @@ def process_data(filename, input_island=1):
 
 
 if __name__ == "__main__":
-    # process_data('many_islands_interaction.out/table.txt', input_island=1)
-    process_data('attempts/table000001.txt', input_island=1)
+    process_data('many_islands_interaction.out/table.txt', input_island=1)
+    # process_data('attempts/table000001.txt', input_island=1)
