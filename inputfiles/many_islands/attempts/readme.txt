@@ -15,3 +15,6 @@ This contains the columns
 - roundness: Roundness of every island, because for now every island is exactly the same.
 - size: Major axis of the constituent ellipses of all islands, because for now every island is exactly the same.
 - Cell_size: Cell size of the simulation grid.
+
+=== log{n}.txt ===
+The mumax3 log.txt file that was generated when calculating table{n}.txt.

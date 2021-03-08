@@ -1,0 +1,75 @@
+//mumax 3.10 [windows_amd64 go1.11.6(gc) CUDA-11.0]
+//GPU info: GeForce MX150(2048MB), CUDA Driver 11.1, cc=6.1, using cc=61 PTX
+//(c) Arne Vansteenkiste, Dynamat LAB, Ghent University, Belgium
+//This is free software without any warranty. See license.txt
+//********************************************************************//
+//  If you use mumax in any work or publication,                      //
+//  we kindly ask you to cite the references in references.bib        //
+//********************************************************************//
+//output directory: c:\Jonathan\UGent\Masterproef\inputfiles\many_islands\many_islands_interaction.out/
+Nx := 256
+Ny := 256
+Nz := 1
+cellSize := 2e-9
+SetGridSize(Nx, Ny, Nz)
+SetCellSize(cellSize, cellSize, 5e-9/Nz)
+Lx := cellSize * Nx
+Ly := cellSize * Ny
+print("Simulation area:", Lx, "by", Ly)
+//Simulation area: 5.12e-07 by 5.12e-07
+Msat = 800e3
+Aex = 13e-12
+print("Exchange length:", Sqrt((2*Aex.GetRegion(0))/(mu0*Pow(Msat.GetRegion(0), 2))))
+//Exchange length: 5.685802385313737e-09
+island_roundness := 0.66
+island_size := 100e-9
+island := Ellipse(island_size, island_size*island_roundness)
+island = island.Add(island.RotZ(Pi / 2))
+angle1 := Pi / 4
+angle2 := 0.0
+angle3 := Pi / 4
+angle4 := -Pi / 2
+a1 := angle1
+a2 := angle2
+a3 := angle3
+island1 := island.RotZ(angle1).Transl(-90e-9, -90e-9, 0)
+island2 := island.RotZ(angle2).Transl(0, 0, 0)
+island3 := island.RotZ(angle3).Transl(128e-9, 0, 0)
+island4 := island.RotZ(angle4).Transl(0, 128e-9, 0)
+geometry := island1.Add(island2).Add(island3).Add(island4)
+SetGeom(geometry)
+DefRegion(1, island1)
+DefRegion(2, island2)
+DefRegion(3, island3)
+DefRegion(4, island4)
+Save(regions)
+B_ext.setRegion(4, Vector(cos(angle4), sin(angle4), 0).Mul(1))
+TableAdd(E_total)
+TableAdd(E_Zeeman)
+TableAddVar(a1, "a1", "rad")
+TableAddVar(a2, "a2", "rad")
+TableAddVar(a3, "a3", "rad")
+TableAdd(m.Region(1))
+TableAdd(m.Region(2))
+TableAdd(m.Region(3))
+TableAdd(m.Region(4))
+TableAddVar(island_roundness, "roundness", "")
+TableAddVar(island_size, "size", "m")
+TableAddVar(cellSize, "Cell_size", "m")
+for a1 = angle1; a1 < 2*Pi; a1 += Pi / 2 {
+	for a2 = angle2; a2 < 2*Pi; a2 += Pi / 2 {
+		for a3 = angle3; a3 < 2*Pi; a3 += Pi / 2 {
+			m.setRegion(1, Uniform(1, 0, 0).rotZ(a1))
+			m.setRegion(2, Uniform(1, 0, 0).rotZ(a2))
+			m.setRegion(3, Uniform(1, 0, 0).rotZ(a3))
+			minimize()
+			TableSave()
+		}
+	}
+}
+//********************************************************************//
+//Please cite the following references, relevant for your simulation. //
+//See bibtex file in output folder for justification.                 //
+//********************************************************************//
+//   * Vansteenkiste et al., AIP Adv. 4, 107133 (2014).
+//   * Exl et al., J. Appl. Phys. 115, 17D118 (2014).
