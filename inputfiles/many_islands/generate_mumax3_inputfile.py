@@ -128,9 +128,9 @@ def generate_mumax3_inputfile(grid, islands, rho=None, L=None):
 
 
 if __name__ == "__main__":
-    generate_mumax3_inputfile(2, [
+    generate_mumax3_inputfile(1, [
         Island(-128, 0, 0),
         Island(0, 0, 0),
         # Island(20, -110, pi/4),
-        Island(0, -128, pi/2, fixed=True)
+        Island(20, -156, pi/2, fixed=True)
     ], rho=0.66, L=100)

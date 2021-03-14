@@ -6,7 +6,6 @@ attemptsFolder = os.listdir('attempts/')
 n = 0
 for s in ['table', 'regions', 'B_ext', 'log']:
     n = max(n, sum(s in i for i in attemptsFolder)) # This is the %06.d number which we will use now
-print(n)
 
 os.system('mumax3-convert -png -arrows 8 "many_islands_interaction.out/*.ovf"')
 outputFolder = os.listdir('many_islands_interaction.out/')

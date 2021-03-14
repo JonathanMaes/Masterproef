@@ -3,10 +3,10 @@
     their magnetization angles.
 */
 //// Grid
-Nx := 128
-Ny := 128
+Nx := 256
+Ny := 256
 Nz := 1
-cellSize := 2.00e-9
+cellSize := 1.00e-9
 SetGridSize(Nx, Ny, Nz)
 SetCellSize(cellSize, cellSize, 5e-9/Nz)
 Lx := cellSize*Nx
@@ -36,9 +36,9 @@ island3 := Ellipse(100.00e-9, 66.00e-9)
 island1 = island1.Add(island1.RotZ(Pi/2))
 island2 = island2.Add(island2.RotZ(Pi/2))
 island3 = island3.Add(island3.RotZ(Pi/2))
-island1 = island1.RotZ(angle1).Transl(-64.000e-9, 64.000e-9, 0)
-island2 = island2.RotZ(angle2).Transl(64.000e-9, 64.000e-9, 0)
-island3 = island3.RotZ(angle3).Transl(64.000e-9, -64.000e-9, 0)
+island1 = island1.RotZ(angle1).Transl(-74.000e-9, 78.000e-9, 0)
+island2 = island2.RotZ(angle2).Transl(54.000e-9, 78.000e-9, 0)
+island3 = island3.RotZ(angle3).Transl(74.000e-9, -78.000e-9, 0)
 // GEOM: Here add all islands together
 geometry := island1.Add(island2).Add(island3)
 SetGeom(geometry)
