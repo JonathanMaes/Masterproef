@@ -25,6 +25,9 @@ def read_mumax3_table(filename):
     
     return table
 
+def convert_ovf(folder):
+    os.system('mumax3-convert -png -arrows 8 %s/*.ovf' % folder)
+
 def anglediff(a1, a2):
     return (a1 - a2 + 180 + 360) % 360 - 180
 
@@ -76,5 +79,8 @@ def process_data(filename, input_island=1):
 
 
 if __name__ == "__main__":
+    convert_ovf('many_islands_interaction.out')
+    print('#'*80)
+
     process_data('many_islands_interaction.out/table.txt', input_island=1)
     # process_data('attempts/table000001.txt', input_island=1)
