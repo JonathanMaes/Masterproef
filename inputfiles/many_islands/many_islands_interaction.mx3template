@@ -3,10 +3,10 @@
     their magnetization angles.
 */
 //// Grid
-Nx := 128
-Ny := 128
+Nx := @{Nx}
+Ny := @{Ny}
 Nz := 1
-cellSize := 2.00e-9
+cellSize := @{cellSize}
 SetGridSize(Nx, Ny, Nz)
 SetCellSize(cellSize, cellSize, 5e-9/Nz)
 Lx := cellSize*Nx
@@ -20,38 +20,25 @@ print("Exchange length:", Sqrt((2*Aex.GetRegion(0))/(mu0*Pow(Msat.GetRegion(0), 
 
 //// Island angles
 // GEOM: For free islands: rotation of geometry (0.0 <= angle{n} < Pi/2), for fixed islands their direction (any value)
-angle1 := 0.0000000000
-angle2 := 0.0000000000
-angle3 := 1.5707963268
+@{anglen}
 
 // GEOM: Here 'a{n} := angle{n}' for all islands {n} which are NOT fixed
-a1 := angle1
-a2 := angle2
+@{an}
 
 //// Island geometries
 // GEOM: Here island{n} := Ellipse().Add(Ellipse().RotZ()).RotZ(angle{n}).Transl(x,y,0)
-island1 := Ellipse(100.00e-9, 66.00e-9)
-island2 := Ellipse(100.00e-9, 66.00e-9)
-island3 := Ellipse(100.00e-9, 66.00e-9)
-island1 = island1.Add(island1.RotZ(Pi/2))
-island2 = island2.Add(island2.RotZ(Pi/2))
-island3 = island3.Add(island3.RotZ(Pi/2))
-island1 = island1.RotZ(angle1).Transl(-64.000e-9, 64.000e-9, 0)
-island2 = island2.RotZ(angle2).Transl(64.000e-9, 64.000e-9, 0)
-island3 = island3.RotZ(angle3).Transl(64.000e-9, -64.000e-9, 0)
+@{islandn}
 // GEOM: Here add all islands together
-geometry := island1.Add(island2).Add(island3)
+@{geometry}
 SetGeom(geometry)
 
 // GEOM: Here define region for all islands
-DefRegion(1, island1)
-DefRegion(2, island2)
-DefRegion(3, island3)
+@{DefRegion}
 Save(regions)
 
 fixationField := 1
 // GEOM: Here set external field for all FIXED islands with B_ext.setRegion({n}, Vector(cos(angle{n}), sin(angle{n}), 0).Mul(fixationField))
-B_ext.setRegion(3, Vector(cos(angle3), sin(angle3), 0).Mul(fixationField))
+@{B_ext}
 Save(B_ext)
 
 //// Track E_total, angle, shape
@@ -59,26 +46,17 @@ Save(B_ext)
 TableAdd(E_total) // Total energy
 TableAdd(E_Zeeman) // Zeeman only takes into account B_ext, and thus the fixation of the fixed islands (to be subtracted from E_total)
 // GEOM: Here print out a{n} for all islands which are NOT fixed (a{n} only exists for those)
-TableAddVar(a1, "a1", "rad")
-TableAddVar(a2, "a2", "rad")
+@{TableAddan}
 // GEOM: Here print out magnetization for all islands, including fixed ones
-TableAdd(m.Region(1))
-TableAdd(m.Region(2))
-TableAdd(m.Region(3))
+@{TableAddmRegions}
 
-TableAddVar(0.660, "roundness", "")
-TableAddVar(100.000, "size", "m")
-
+@{TableAddGlobals}
 TableAddVar(cellSize, "Cell_size", "m")
 
 //// Many nested loops
 // GEOM: A loop for each island that is NOT fixed
-for a1=angle1; a1 < 2*Pi+angle1; a1 += Pi/2 {
-    m.setRegion(1, Uniform(1,0,0).rotZ(a1))
-for a2=angle2; a2 < 2*Pi+angle2; a2 += Pi/2 {
-    m.setRegion(2, Uniform(1,0,0).rotZ(a2))
+@{loops}
     
     minimize()
     TableSave()
-}
-}
+@{loops_closing_braces}
