@@ -92,7 +92,7 @@ def generate_mumax3_inputfile(grid, islands, rho=None, L=None):
     # angle{n} (geometry angle) and a{n} (magnetization angle)
     angle_text = '\n'.join([('angle%d := %.10f' % (i+1, island.a)) for i, island in enumerate(islands)])
     text = text.replace(r'@{anglen}', angle_text)
-    a_text = '\n'.join([('a%d := angle%d' % (i+1, i+1)) for i, island in enumerate(islands) if not island.fixed])
+    a_text = '\n'.join([('a%d := angle%d' % (i+1, i+1)) for i, island in enumerate(islands)])
     text = text.replace(r'@{an}', a_text)
     # islands and geometry
     islands_text = '\n'.join([('island%d := Ellipse(%.2fe-9, %.2fe-9)' % (i+1, island.L, island.L*island.rho)) for i, island in enumerate(islands)])
@@ -108,7 +108,7 @@ def generate_mumax3_inputfile(grid, islands, rho=None, L=None):
     extfield_text = '\n'.join([('B_ext.setRegion(%d, Vector(cos(angle%d), sin(angle%d), 0).Mul(fixationField))' % (i+1,i+1,i+1)) for i, island in enumerate(islands) if island.fixed])
     text = text.replace(r'@{B_ext}', extfield_text)
     # table columns
-    table_an_text = '\n'.join([('TableAddVar(a%d, "a%d", "rad")' % (i+1, i+1)) for i, island in enumerate(islands) if not island.fixed])
+    table_an_text = '\n'.join([('TableAddVar(a%d, "a%d", "rad")' % (i+1, i+1)) for i, island in enumerate(islands)])
     text = text.replace(r'@{TableAddan}', table_an_text)
     table_mregions_text = '\n'.join([('TableAdd(m.Region(%d))' % (i+1)) for i, _ in enumerate(islands)])
     text = text.replace(r'@{TableAddmRegions}', table_mregions_text)
