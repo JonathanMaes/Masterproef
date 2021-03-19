@@ -152,14 +152,16 @@ def get_lowest_energies(filename, input_island, verbose=True):
         new_mag_angles, new_energies = collect_orientation(input_island, geom_angles[input_island-1]+i*90, mag_angles, energies, geom_angles)
 
         if len(new_energies) == 0: # No stable configurations for <input_island> at geom_angles[i]
+            print('Island %d does not have a stable orientation around %d degrees.' % (input_island, geom_angles[input_island-1]+i*90))
             return (None, None)
         else:
             minEnergies.append(new_energies[0])
             minEnergyMagAngles.append(new_mag_angles[0])
 
     if not verbose:
-        print('Lowest energies: \n', minEnergies)
-        print('\nStable angles: \n', np.array(minEnergyMagAngles))
+        print('For island %d:' % input_island)
+        print(' Lowest energies: \n %s' % minEnergies)
+        print(' Stable angles: \n %s' % np.array(minEnergyMagAngles))
     return (np.array(minEnergyMagAngles), np.array(minEnergies))
 
 def check_if_halfadder(filename):
@@ -177,6 +179,7 @@ def check_if_halfadder(filename):
     """
     _, _, geom_angles = process_data(filename)
     halfAdder = {0:0,1:1,2:1,3:2}
+    found_halfadders = []
     for i in range(len(geom_angles)): # Input island <i>
         minEnergyMagAngles, _ = get_lowest_energies(filename, i+1)
         if minEnergyMagAngles is None: # Then no stable configurations exist for some angle of input <i> (e.g. because island <i> is fixed)
@@ -196,11 +199,12 @@ def check_if_halfadder(filename):
                 should_be_output_bits = list(map(halfAdder.get, input_bits))
                 output_bits = list(map(d.get, angles_j))
                 if should_be_output_bits == output_bits:
-                    print("Half adder found!")
-                    print("Input island %d, output island %d, where" % (i, j))
+                    print("Half adder found for %s!" % filename)
+                    print("Input island %d, output island %d, where" % (i+1, j+1))
                     print("angles %s correspond to %s." % (list(angles_i), input_bits))
-                    return (i, j, angles_i, input_bits)
-    return False
+                    print("#"*80)
+                    found_halfadders.append((i, j, angles_i, input_bits))
+    return found_halfadders
 
 
 # TODO: write function that plots the low energies, given a certain input island.
@@ -217,8 +221,14 @@ if __name__ == "__main__":
     # convert_ovf('many_islands_interaction.out')
     # print('#'*80)
 
+    # check_if_halfadder('many_islands_interaction.out/table.txt')
+    # get_lowest_energies('many_islands_interaction.out/table.txt', 1, verbose=False)
+    # get_lowest_energies('many_islands_interaction.out/table.txt', 4, verbose=False)
+    get_lowest_energies('many_islands_interaction.out/table.txt', 6, verbose=False)
     # mag_angles, energies, geom_angles = process_data('many_islands_interaction.out/table.txt')
     # collect_orientation(1, 0, mag_angles, energies, geom_angles)
-    # get_lowest_energies('many_islands_interaction.out/table.txt', 1)
-    # check_if_halfadder('many_islands_interaction.out/table.txt')
-    check_if_halfadder('attempts/table000006.txt')
+
+    # mag_angles, energies, geom_angles = process_data('attempts/table000006.txt')
+    # collect_orientation(1, 0, mag_angles, energies, geom_angles)
+    # get_lowest_energies('attempts/table000006.txt', 1, verbose=False)
+    # check_if_halfadder('attempts/table000006.txt')

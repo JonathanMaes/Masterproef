@@ -1,0 +1,116 @@
+//mumax 3.10 [linux_amd64 go1.14(gc) CUDA-10.2]
+//GPU info: GeForce GTX 1080(8117MB), CUDA Driver 10.2, cc=6.1, using cc=61 PTX
+//(c) Arne Vansteenkiste, Dynamat LAB, Ghent University, Belgium
+//This is free software without any warranty. See license.txt
+//********************************************************************//
+//  If you use mumax in any work or publication,                      //
+//  we kindly ask you to cite the references in references.bib        //
+//********************************************************************//
+//output directory: many_islands_interaction.out/
+Nx := 256
+Ny := 256
+Nz := 1
+cellSize := 2.00e-9
+SetGridSize(Nx, Ny, Nz)
+SetCellSize(cellSize, cellSize, 5e-9/Nz)
+Lx := cellSize * Nx
+Ly := cellSize * Ny
+print("Simulation area:", Lx, "by", Ly)
+//Simulation area: 5.12e-07 by 5.12e-07
+Msat = 800e3
+Aex = 13e-12
+print("Exchange length:", Sqrt((2*Aex.GetRegion(0))/(mu0*Pow(Msat.GetRegion(0), 2))))
+//Exchange length: 5.685802385313737e-09
+angle1 := 0.0000000000
+angle2 := 0.0000000000
+angle3 := 1.5707963268
+angle4 := 0.0000000000
+angle5 := 0.0000000000
+angle6 := 0.0000000000
+angle7 := 0.0000000000
+a1 := angle1
+a2 := angle2
+a3 := angle3
+a4 := angle4
+a5 := angle5
+a6 := angle6
+a7 := angle7
+island1 := Ellipse(100.00e-9, 66.00e-9)
+island2 := Ellipse(100.00e-9, 66.00e-9)
+island3 := Ellipse(100.00e-9, 66.00e-9)
+island4 := Ellipse(100.00e-9, 66.00e-9)
+island5 := Ellipse(100.00e-9, 66.00e-9)
+island6 := Ellipse(100.00e-9, 66.00e-9)
+island7 := Ellipse(100.00e-9, 66.00e-9)
+island1 = island1.Add(island1.RotZ(Pi / 2))
+island2 = island2.Add(island2.RotZ(Pi / 2))
+island3 = island3.Add(island3.RotZ(Pi / 2))
+island4 = island4.Add(island4.RotZ(Pi / 2))
+island5 = island5.Add(island5.RotZ(Pi / 2))
+island6 = island6.Add(island6.RotZ(Pi / 2))
+island7 = island7.Add(island7.RotZ(Pi / 2))
+island1 = island1.RotZ(angle1).Transl(-154.000e-9, -50.000e-9, 0)
+island2 = island2.RotZ(angle2).Transl(-26.000e-9, -50.000e-9, 0)
+island3 = island3.RotZ(angle3).Transl(-6.000e-9, -206.000e-9, 0)
+island4 = island4.RotZ(angle4).Transl(-154.000e-9, 78.000e-9, 0)
+island5 = island5.RotZ(angle5).Transl(64.000e-9, 40.000e-9, 0)
+island6 = island6.RotZ(angle6).Transl(-154.000e-9, 206.000e-9, 0)
+island7 = island7.RotZ(angle7).Transl(154.000e-9, 130.000e-9, 0)
+geometry := island1.Add(island2).Add(island3).Add(island4).Add(island5).Add(island6).Add(island7)
+SetGeom(geometry)
+DefRegion(1, island1)
+DefRegion(2, island2)
+DefRegion(3, island3)
+DefRegion(4, island4)
+DefRegion(5, island5)
+DefRegion(6, island6)
+DefRegion(7, island7)
+Save(regions)
+fixationField := 1
+B_ext.setRegion(3, Vector(cos(angle3), sin(angle3), 0).Mul(fixationField))
+Save(B_ext)
+TableAdd(E_total)
+TableAdd(E_Zeeman)
+TableAddVar(a1, "a1", "rad")
+TableAddVar(a2, "a2", "rad")
+TableAddVar(a3, "a3", "rad")
+TableAddVar(a4, "a4", "rad")
+TableAddVar(a5, "a5", "rad")
+TableAddVar(a6, "a6", "rad")
+TableAddVar(a7, "a7", "rad")
+TableAdd(m.Region(1))
+TableAdd(m.Region(2))
+TableAdd(m.Region(3))
+TableAdd(m.Region(4))
+TableAdd(m.Region(5))
+TableAdd(m.Region(6))
+TableAdd(m.Region(7))
+TableAddVar(0.660, "roundness", "")
+TableAddVar(100.000, "size", "m")
+TableAddVar(cellSize, "Cell_size", "m")
+for a1 = angle1; a1 < 2*Pi+angle1; a1 += Pi / 2 {
+	m.setRegion(1, Uniform(1, 0, 0).rotZ(a1))
+	for a2 = angle2; a2 < 2*Pi+angle2; a2 += Pi / 2 {
+		m.setRegion(2, Uniform(1, 0, 0).rotZ(a2))
+		for a4 = angle4; a4 < 2*Pi+angle4; a4 += Pi / 2 {
+			m.setRegion(4, Uniform(1, 0, 0).rotZ(a4))
+			for a5 = angle5; a5 < 2*Pi+angle5; a5 += Pi / 2 {
+				m.setRegion(5, Uniform(1, 0, 0).rotZ(a5))
+				for a6 = angle6; a6 < 2*Pi+angle6; a6 += Pi / 2 {
+					m.setRegion(6, Uniform(1, 0, 0).rotZ(a6))
+					for a7 = angle7; a7 < 2*Pi+angle7; a7 += Pi / 2 {
+						m.setRegion(7, Uniform(1, 0, 0).rotZ(a7))
+						minimize()
+						TableSave()
+					}
+				}
+			}
+		}
+	}
+}
+//********************************************************************//
+//Please cite the following references, relevant for your simulation. //
+//See bibtex file in output folder for justification.                 //
+//********************************************************************//
+//   * Vansteenkiste et al., AIP Adv. 4, 107133 (2014).
+//   * Exl et al., J. Appl. Phys. 115, 17D118 (2014).
