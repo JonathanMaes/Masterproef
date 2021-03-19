@@ -73,7 +73,7 @@ def plot(filename, save=True, inset=None, groupBy=None):
 
     plt.grid(axis='y', color='grey', linestyle=':', linewidth=1)
     plt.xlabel(r'Elapsed time $t$ [ns]')
-    plt.ylabel(r'Average magnetization angle $\theta$ [°]')
+    plt.ylabel(r'Average magnetization angle $\Theta$ [°]')
     plt.xlim(timeRange[0], timeRange[1])
     angle_interval = 90
     yticks = np.arange(angleRange[0]//angle_interval*angle_interval, angleRange[1]//angle_interval*angle_interval+angle_interval+1, angle_interval)
@@ -122,14 +122,14 @@ if __name__ == "__main__":
     # inFileName = 'biaxial_island_switching_extfield.out/table.txt'
 
     #### FINALIZED PLOTS
-    # plot('biaxial_island_switching_plus.out/table_65x100_300K_alpha0.01_1µs_4nm.txt', save=1, inset=[0.6, 0.6, 0.37, 0.37, 470, 5])
-    # plot('biaxial_island_switching_plus.out/table_65x100_300K_alpha0.1_1µs_4nm.txt', save=1, inset=[0.6, 0.1, 0.37, 0.37, 420, 5])
-    # plot('biaxial_island_switching_plus.out/table_65x100_300K_alpha0.1_1µs_4nm.txt', save=1)
-    # plot('biaxial_island_switching_plus.out/table_65x100_300K_alpha0.01_1µs_4nm.txt', save=1)
-    # plot('biaxial_island_switching_plus.out/table_65x100_350K_alpha0.01_1µs_4nm.txt', save=1)
-    # plot('biaxial_island_switching_plus.out/table_65x100_273K_alpha0.01_1µs_4nm.txt', save=1)
-    # plot('biaxial_island_switching_plus.out/table_100x100_300K_alpha0.01_1µs_4nm.txt', save=1)
-    # plot('biaxial_island_switching_plus.out/table_100x100_350K_alpha0.01_1µs_4nm.txt', save=1)
-    # plot('biaxial_island_switching_plus.out/table_49x100_300K_alpha0.01_100ns_2nm.txt', save=1)
-    # plot('biaxial_island_switching_plus.out/table_65x100_350K_alpha0.01_0.5µs_2nm.txt', save=1)
-    # plot('biaxial_island_switching_plus.out/table_65x100_350K_alpha0.01_1µs_3.125nm.txt', save=1)
+    plot('biaxial_island_switching_plus.out/table_65x100_300K_alpha0.01_1µs_4nm.txt', save=1, inset=[0.6, 0.6, 0.37, 0.37, 470, 5])
+    plot('biaxial_island_switching_plus.out/table_65x100_300K_alpha0.1_1µs_4nm.txt', save=1, inset=[0.6, 0.1, 0.37, 0.37, 420, 5])
+    plot('biaxial_island_switching_plus.out/table_65x100_300K_alpha0.1_1µs_4nm.txt', save=1)
+    plot('biaxial_island_switching_plus.out/table_65x100_300K_alpha0.01_1µs_4nm.txt', save=1)
+    plot('biaxial_island_switching_plus.out/table_65x100_350K_alpha0.01_1µs_4nm.txt', save=1)
+    plot('biaxial_island_switching_plus.out/table_65x100_273K_alpha0.01_1µs_4nm.txt', save=1)
+    plot('biaxial_island_switching_plus.out/table_100x100_300K_alpha0.01_1µs_4nm.txt', save=1)
+    plot('biaxial_island_switching_plus.out/table_100x100_350K_alpha0.01_1µs_4nm.txt', save=1)
+    plot('biaxial_island_switching_plus.out/table_49x100_300K_alpha0.01_100ns_2nm.txt', save=1)
+    plot('biaxial_island_switching_plus.out/table_65x100_350K_alpha0.01_0.5µs_2nm.txt', save=1)
+    plot('biaxial_island_switching_plus.out/table_65x100_350K_alpha0.01_1µs_3.125nm.txt', save=1)
