@@ -23,7 +23,7 @@ def read_mumax3_table(filename):
     
     return table
 
-def plot(filename, save=False, inset=None, groupBy=None):
+def plot(filename, save=True, inset=None, groupBy=None):
     '''
         @param filename [str]: relative path of the mumax table
         @param save [bool] <False>: Whether or not to save the created plot.
@@ -72,8 +72,8 @@ def plot(filename, save=False, inset=None, groupBy=None):
         plt.legend(legend)
 
     plt.grid(axis='y', color='grey', linestyle=':', linewidth=1)
-    plt.xlabel(r'$t$ [ns]')
-    plt.ylabel(r'angle [°]')
+    plt.xlabel(r'Elapsed time $t$ [ns]')
+    plt.ylabel(r'Average magnetization angle $\theta$ [°]')
     plt.xlim(timeRange[0], timeRange[1])
     angle_interval = 90
     yticks = np.arange(angleRange[0]//angle_interval*angle_interval, angleRange[1]//angle_interval*angle_interval+angle_interval+1, angle_interval)
@@ -116,16 +116,20 @@ def plot(filename, save=False, inset=None, groupBy=None):
 
 
 if __name__ == "__main__":
-    # plot('biaxial_island_switching_plus.out/table_65x100_300K_alpha0.01_1µs_4nm.txt', save=1, inset=[0.6, 0.6, 0.37, 0.37, 470, 5])
-    plot('biaxial_island_switching_plus.out/table_65x100_300K_alpha0.1_1µs_4nm.txt', save=1, inset=[0.6, 0.1, 0.37, 0.37, 420, 5])
-    # inFileName = 'biaxial_island_switching_plus.out/table_65x100_300K_alpha0.1_1µs_4nm.txt'
-    # inFileName = 'biaxial_island_switching_plus.out/table_65x100_300K_alpha0.01_1µs_4nm.txt'
-    # inFileName = 'biaxial_island_switching_plus.out/table_65x100_350K_alpha0.01_1µs_4nm.txt'
-    # inFileName = 'biaxial_island_switching_plus.out/table_65x100_273K_alpha0.01_1µs_4nm.txt'
-    # inFileName = 'biaxial_island_switching_plus.out/table_100x100_350K_alpha0.01_1µs_4nm.txt'
-    # inFileName = 'biaxial_island_switching_plus.out/table_49x100_300K_alpha0.01_100ns_2nm.txt'
-    # inFileName = 'biaxial_island_switching_plus.out/table_65x100_350K_alpha0.01_0.5µs_2nm.txt'
-    # inFileName = 'biaxial_island_switching_plus.out/table_65x100_350K_alpha0.01_1µs_3.125nm.txt'
+    #### TESTS
     # inFileName = 'biaxial_island_switching_extfield.out/table_50x45_ext0.00015_ext3Pi8_1.25µs_3.125nm.txt'
     # inFileName = 'biaxial_island_switching_extfield.out/table_50x45_ext0_10ns_3.125nm.txt'
     # inFileName = 'biaxial_island_switching_extfield.out/table.txt'
+
+    #### FINALIZED PLOTS
+    # plot('biaxial_island_switching_plus.out/table_65x100_300K_alpha0.01_1µs_4nm.txt', save=1, inset=[0.6, 0.6, 0.37, 0.37, 470, 5])
+    # plot('biaxial_island_switching_plus.out/table_65x100_300K_alpha0.1_1µs_4nm.txt', save=1, inset=[0.6, 0.1, 0.37, 0.37, 420, 5])
+    # plot('biaxial_island_switching_plus.out/table_65x100_300K_alpha0.1_1µs_4nm.txt', save=1)
+    # plot('biaxial_island_switching_plus.out/table_65x100_300K_alpha0.01_1µs_4nm.txt', save=1)
+    # plot('biaxial_island_switching_plus.out/table_65x100_350K_alpha0.01_1µs_4nm.txt', save=1)
+    # plot('biaxial_island_switching_plus.out/table_65x100_273K_alpha0.01_1µs_4nm.txt', save=1)
+    # plot('biaxial_island_switching_plus.out/table_100x100_300K_alpha0.01_1µs_4nm.txt', save=1)
+    # plot('biaxial_island_switching_plus.out/table_100x100_350K_alpha0.01_1µs_4nm.txt', save=1)
+    # plot('biaxial_island_switching_plus.out/table_49x100_300K_alpha0.01_100ns_2nm.txt', save=1)
+    # plot('biaxial_island_switching_plus.out/table_65x100_350K_alpha0.01_0.5µs_2nm.txt', save=1)
+    # plot('biaxial_island_switching_plus.out/table_65x100_350K_alpha0.01_1µs_3.125nm.txt', save=1)
