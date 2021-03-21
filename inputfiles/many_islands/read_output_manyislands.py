@@ -109,13 +109,9 @@ def collect_orientation(island, angle, mag_angles, energies, geom_angles, margin
     mag_angles = mag_angles[indices_close_to_a1]
 
     for i, entry in enumerate(mag_angles):
-        found_similar_entry = False
-        for j, other in enumerate(mag_angles[:i]):
-            if np.all(np.abs(anglediff(entry, other)) < margin_mag) and abs(energies[i]-energies[j]) < margin_energy: # True if the two entries are similar (both with angles and energy)
-                found_similar_entry = True
-                break
-        if found_similar_entry:
-            continue
+        # Search for a similar entry, if both mag_angles and energies are similar, then discard this one
+        if np.any(np.all(np.abs(anglediff(entry, mag_angles[:i])) < margin_mag, axis=1)) and np.any(np.abs(energies[i]-energies[:i]) < margin_energy):
+            continue # Similar entry has already been recorded, so dont record <i>
         else:
             new_mag_angles.append(entry)
             new_energies.append(energies[i])
@@ -181,6 +177,7 @@ def check_if_halfadder(filename):
     halfAdder = {0:0,1:1,2:1,3:2}
     found_halfadders = []
     for i in range(len(geom_angles)): # Input island <i>
+        print('Checking if island %d can be an input...' % (i+1))
         minEnergyMagAngles, _ = get_lowest_energies(filename, i+1)
         if minEnergyMagAngles is None: # Then no stable configurations exist for some angle of input <i> (e.g. because island <i> is fixed)
             continue
@@ -221,10 +218,10 @@ if __name__ == "__main__":
     # convert_ovf('many_islands_interaction.out')
     # print('#'*80)
 
-    # check_if_halfadder('many_islands_interaction.out/table.txt')
+    check_if_halfadder('many_islands_interaction.out/table.txt')
     # get_lowest_energies('many_islands_interaction.out/table.txt', 1, verbose=False)
     # get_lowest_energies('many_islands_interaction.out/table.txt', 4, verbose=False)
-    get_lowest_energies('many_islands_interaction.out/table.txt', 6, verbose=False)
+    # get_lowest_energies('many_islands_interaction.out/table.txt', 6, verbose=False)
     # mag_angles, energies, geom_angles = process_data('many_islands_interaction.out/table.txt')
     # collect_orientation(1, 0, mag_angles, energies, geom_angles)
 
