@@ -62,7 +62,7 @@ def process_data(filename, sort_energies=True, normalize_energies=True):
         if re.compile(r"^m\.region\d+x$").match(name):
             num_islands += 1
     geom_angles = []
-    for i in range(num_islands):
+    for i in range(1,num_islands+1):
         if 'a%d' % i in table.columns:
             geom_angles.append(rad_to_deg(table['a%d'%i].iloc[0]) % 90)
         else: # Default for fixed islands because we dont care about these in the output anyway
@@ -115,7 +115,7 @@ def collect_orientation(island, angle, mag_angles, energies, geom_angles, margin
         else:
             new_mag_angles.append(entry)
             new_energies.append(energies[i])
-    return (new_mag_angles, new_energies)
+    return (np.array(new_mag_angles), np.array(new_energies))
 
 # TODO: Now write a function that does
 # - Extra function to plot energies corresponding to a certain input for a certain island
@@ -153,6 +153,8 @@ def get_lowest_energies(filename, input_island, verbose=True):
         else:
             minEnergies.append(new_energies[0])
             minEnergyMagAngles.append(new_mag_angles[0])
+            if abs(new_energies[0] - new_energies[1]) < 1e-4:
+                print('Input island %d at %d deg is DEGENERATE!' % (input_island, geom_angles[input_island-1]+i*90))
 
     if not verbose:
         print('For island %d:' % input_island)
@@ -211,15 +213,40 @@ def check_if_halfadder(filename):
 # This will nicely illustrate whether the geometry is balanced, and how robust it is.
 # You see, if one of these plot lines is too flat, it is easy for the geometry to go into
 # this other, slightly higher energy state, which is of course undesirable.
-
+def plot_energy_levels(filename, input_island, trunc=5):
+    mag_angles, energies, geom_angles = process_data(filename)
+    y_trunc = 0
+    for i in range(4):
+        angle = geom_angles[input_island-1]+i*90
+        collected_mag_angles, collected_energies = collect_orientation(input_island, angle, mag_angles, energies, geom_angles)
+        if len(collected_energies) == 0:
+            continue
+        plt.plot(range(len(collected_energies)), collected_energies, label='Input %d°' % angle)
+        y_trunc = max(y_trunc, max(collected_energies[:trunc+1]))
+        print('Energy levels for input island %d at %d deg:' % (input_island, angle))
+        print(collected_energies[:trunc+1])
+        with np.printoptions(precision=0, suppress=True):
+            print('Corresponding magnetization angles:')
+            print(np.array(collected_mag_angles[:trunc+1]))
+        print('-'*80)
+    plt.title('Input island %d' % input_island)
+    plt.legend()
+    plt.xlabel('Energy level $n$')
+    plt.ylabel('Energy [eV]')
+    plt.grid(axis='x', color='grey', linestyle=':', linewidth=1)
+    plt.xlim([0,trunc])
+    plt.ylim([0,y_trunc])
+    plt.gcf().tight_layout()
+    plt.show()
 
 if __name__ == "__main__":
     # TODO: Make the conversion auto-detect whether the folder is 'many_islands_interaction.out'.
     # convert_ovf('many_islands_interaction.out')
     # print('#'*80)
 
-    check_if_halfadder('many_islands_interaction.out/table.txt')
-    # get_lowest_energies('many_islands_interaction.out/table.txt', 1, verbose=False)
+    # check_if_halfadder('many_islands_interaction.out/table.txt')
+    # plot_energy_levels('many_islands_interaction.out/table.txt', 1)
+    get_lowest_energies('many_islands_interaction.out/table.txt', 3, verbose=False)
     # get_lowest_energies('many_islands_interaction.out/table.txt', 4, verbose=False)
     # get_lowest_energies('many_islands_interaction.out/table.txt', 6, verbose=False)
     # mag_angles, energies, geom_angles = process_data('many_islands_interaction.out/table.txt')
@@ -229,3 +256,4 @@ if __name__ == "__main__":
     # collect_orientation(1, 0, mag_angles, energies, geom_angles)
     # get_lowest_energies('attempts/table000006.txt', 1, verbose=False)
     # check_if_halfadder('attempts/table000006.txt')
+    # plot_energy_levels('attempts/table000006.txt', 1)

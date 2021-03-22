@@ -119,8 +119,9 @@ def generate_mumax3_inputfile(grid, islands, rho=None, L=None):
         table_globals_text += 'TableAddVar(%.3f, "size", "m")\n' % L
     text = text.replace(r'@{TableAddGlobals}', table_globals_text)
     # loops
-    loop_text = '\n'.join([('for a%d=angle%d; a%d < 2*Pi+angle%d; a%d += Pi/2 {\n    m.setRegion(%d, Uniform(1,0,0).rotZ(a%d))' % (i+1,i+1,i+1,i+1,i+1,i+1,i+1)) for i, island in enumerate(islands) if not island.fixed])
-    text = text.replace(r'@{loops}', loop_text)
+    loops_text = '\n'.join([('for a%d=angle%d; a%d < 2*Pi+angle%d; a%d += Pi/2 {' % (i+1,i+1,i+1,i+1,i+1)) for i, island in enumerate(islands) if not island.fixed])
+    inside_text = '\n'.join([('    m.setRegion(%d, Uniform(1,0,0).rotZ(a%d))' % (i+1,i+1)) for i, island in enumerate(islands) if not island.fixed])
+    text = text.replace(r'@{loops}', loops_text+'\n'+inside_text)
     text = text.replace(r'@{loops_closing_braces}', '}\n'*len([i for i in islands if not i.fixed]))
     
     with open('many_islands_interaction.mx3', 'w') as outFile:
@@ -128,12 +129,18 @@ def generate_mumax3_inputfile(grid, islands, rho=None, L=None):
 
 
 if __name__ == "__main__":
+    # generate_mumax3_inputfile(2, [
+    #     Island(-128, 0, 0),
+    #     Island(0, 0, 0),
+    #     Island(20, -156, pi/2, fixed=True),
+    #     Island(-128, 128, 0),
+    #     Island(90, 90, 0),
+    #     Island(-128, 256, 0),
+    #     Island(180, 180, 0)
+    # ], rho=0.66, L=100)
     generate_mumax3_inputfile(2, [
-        Island(-128, 0, 0),
-        Island(0, 0, 0),
-        Island(20, -156, pi/2, fixed=True),
-        Island(-128, 128, 0),
-        Island(90, 90, 0),
-        Island(-128, 256, 0),
-        Island(180, 180, 0)
+        Island(0, 0, pi/4),
+        Island(90, -90, 0),
+        Island(-90, -90, 0),
+        Island(0, -180, pi/4)
     ], rho=0.66, L=100)
