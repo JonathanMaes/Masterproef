@@ -22,12 +22,13 @@ def read_mumax3_table(filename):
     return table
 
 if __name__ == "__main__":
-    SAVE1 = False
+    SAVE1 = True
     SAVE2 = False
     USE_ELECTRONVOLT = True
     USE_RELAXED_ANGLE = True
     
-    inFileName = 'biaxial_island_shape_field.out/tablePlus_65_B25-0.001-div4_a128Pi_plotOptimized.txt'
+    # inFileName = 'biaxial_island_shape_field.out/tablePlus_65_B25-0.001-div4_a128Pi_plotOptimized.txt'
+    inFileName = 'biaxial_island_shape_field.out/tablePlus_48.2_B25-0.001-div4_a128Pi_plotOptimized.txt'
     outDir1 = 'Figures/BarrierLandscape'
     if not os.path.exists(outDir1):
         os.makedirs(outDir1)
@@ -71,8 +72,12 @@ if __name__ == "__main__":
     plt.grid(color='grey', linestyle=':', linewidth=1)
     plt.legend(legend)
     plt.xlim([0,90])
-    plt.ylim([8.1e-19/ELECTRONVOLT_FACTOR, 8.8e-19/ELECTRONVOLT_FACTOR])
-    plt.xlabel(r"Relaxed magnetization angle $\widetilde{\Theta}$ [°]" if USE_RELAXED_ANGLE else r"External magnetic field angle $\theta$ [°]")
+    if inFileName == 'biaxial_island_shape_field.out/tablePlus_65_B25-0.001-div4_a128Pi_plotOptimized.txt':
+        plt.ylim([8.1e-19/ELECTRONVOLT_FACTOR, 8.8e-19/ELECTRONVOLT_FACTOR])
+    elif inFileName == 'biaxial_island_shape_field.out/tablePlus_48.2_B25-0.001-div4_a128Pi_plotOptimized.txt':
+        plt.ylim([4.85,5.19])
+        # plt.ylim([4.87,4.94])
+    plt.xlabel(r"Relaxed magnetization angle $\widetilde{\Theta}$ [°]" if USE_RELAXED_ANGLE else r"External magnetic field angle $\widetilde{\chi}$ [°]")
     plt.ylabel(r"Energy [%s]" % ('eV' if USE_ELECTRONVOLT else 'J'))
 
     # Show plot

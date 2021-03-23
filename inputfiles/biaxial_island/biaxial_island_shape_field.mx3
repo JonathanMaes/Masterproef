@@ -14,7 +14,7 @@ Aex = 13e-12
 print("Exchange length:", Sqrt((2*Aex.GetRegion(0))/(mu0*Pow(Msat.GetRegion(0), 2)))) // 5.6858e-9 so ok to use Nz = 1 for 5e-9 thickness
 
 //// Shape
-geometry := Ellipse(100e-9, 65e-9)
+geometry := Ellipse(100e-9, 48.2e-9)
 geometry = geometry.Add(geometry.RotZ(Pi/2))
 SetGeom(geometry)
 

@@ -15,7 +15,7 @@ Msat = 800e3
 Aex = 13e-12
 print("Exchange length:", Sqrt((2*Aex.GetRegion(0))/(mu0*Pow(Msat.GetRegion(0), 2))))
 //Exchange length: 5.685802385313737e-09
-geometry := Ellipse(100e-9, 65e-9)
+geometry := Ellipse(100e-9, 48.2e-9)
 geometry = geometry.Add(geometry.RotZ(Pi / 2))
 SetGeom(geometry)
 TableAdd(E_total)
