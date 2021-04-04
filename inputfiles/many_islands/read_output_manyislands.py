@@ -16,6 +16,7 @@ from matplotlib import cm
 
 font = {'size':16}
 matplotlib.rc('font', **font)
+matplotlib.rcParams['axes.prop_cycle'] = matplotlib.cycler(color=["b", "y", "r", "lightgreen"]) 
 
 
 def read_mumax3_table(filename):
@@ -84,7 +85,7 @@ def process_data(filename, sort_energies=True, normalize_energies=True):
     return (mag_angles, energies, geom_angles)
 
 
-def collect_orientation(island, angle, mag_angles, energies, geom_angles, margin_mag=22.5, margin_energy=0.01, sort_energies=True):
+def collect_orientation(island, angle, mag_angles, energies, geom_angles, margin_mag=45, margin_energy=0.01, sort_energies=True):
     """
         Given an island number <island>, and a desired direction <angle>, this function
         looks at only those entries which have island <island> at or near that angle.
@@ -162,12 +163,15 @@ def get_lowest_energies(filename, input_island, verbose=True):
         print(' Stable angles: \n %s' % np.array(minEnergyMagAngles))
     return (np.array(minEnergyMagAngles), np.array(minEnergies))
 
-def check_if_halfadder(filename):
+def check_if_halfadder(filename, allow_rotation=False):
     """
         For a given mumax3 table file at <filename>, this function looks if there is a half adder
         possible with the relaxed magnetizations from the table file.
 
         @param filename [str]: Relative path to mumax3 table.txt file.
+        @param allow_rotation [bool] (False): If true, the search does not care about the orientation of input
+                                              and output with respect to each other, so this allows for 45°
+                                              difference to be neglected. TODO!
         @returns: - False if no half adder was found.
                   - (i, j, angles_i, input_bits), where
                     i: Index of input island.
@@ -183,13 +187,16 @@ def check_if_halfadder(filename):
         minEnergyMagAngles, _ = get_lowest_energies(filename, i+1)
         if minEnergyMagAngles is None: # Then no stable configurations exist for some angle of input <i> (e.g. because island <i> is fixed)
             continue
-        angles_i = round_90(minEnergyMagAngles[:,i].T, delta=geom_angles[i])
+        angles_i = anglediff(0, round_90(minEnergyMagAngles[:,i].T, delta=geom_angles[i]))
         if np.all(np.array(angles_i) == angles_i[0]): # Then island <i> is fixed
             continue
         for j in range(len(geom_angles)): # Output island <j>
-            if i == j or geom_angles[i] != geom_angles[j]: # If same island, or not same orientation, then skip
+            if i == j: # If same island, then skip
                 continue
-            angles_j = round_90(minEnergyMagAngles[:,j].T, delta=geom_angles[j])
+            if not allow_rotation:
+                if geom_angles[i] != geom_angles[j]: # If not same orientation, then skip
+                    continue
+            angles_j = anglediff(0, round_90(minEnergyMagAngles[:,j].T, delta=geom_angles[j]))
             if np.all(np.array(angles_j) == angles_j[0]): # Then island <j> is fixed
                 continue
             for perm in itertools.permutations([0,1,2,3]):
@@ -207,13 +214,20 @@ def check_if_halfadder(filename):
 
 
 # TODO: write function that plots the low energies, given a certain input island.
-# This should be a matplotlib plot, with four lines in it. Each line corresponds to the
-# input island being put at a certain input bit. For this input bit angle, a plot-line
-# is then drawn corresponding to the energy of all possible configurations, in order.
-# This will nicely illustrate whether the geometry is balanced, and how robust it is.
-# You see, if one of these plot lines is too flat, it is easy for the geometry to go into
-# this other, slightly higher energy state, which is of course undesirable.
+# 
 def plot_energy_levels(filename, input_island, trunc=5):
+    '''
+        Shows a matplotlib plot, with four lines in it. Each line corresponds to the
+        input island being put at a certain input bit. For this input bit angle, a plot-line
+        is then drawn corresponding to the energy of all possible configurations, in order.
+        This will nicely illustrate whether the geometry is balanced, and how robust it is.
+        You see, if one of these plot lines is too flat, it is easy for the geometry to go into
+        this other, slightly higher energy state, which is of course undesirable.
+
+        @param filename [str]: Relative path to mumax3 table.txt file.
+        @param input_island [int]: The island that is considered the 'input island'.
+        @param trunc [int] (5): Maximum amount of lowest-lying-energy-levels that are plotted/printed.
+    '''
     mag_angles, energies, geom_angles = process_data(filename)
     y_trunc = 0
     for i in range(4):
@@ -244,9 +258,9 @@ if __name__ == "__main__":
     # convert_ovf('many_islands_interaction.out')
     # print('#'*80)
 
-    # check_if_halfadder('many_islands_interaction.out/table.txt')
-    # plot_energy_levels('many_islands_interaction.out/table.txt', 1)
-    get_lowest_energies('many_islands_interaction.out/table.txt', 3, verbose=False)
+    check_if_halfadder('many_islands_interaction.out/table.txt')
+    plot_energy_levels('many_islands_interaction.out/table.txt', 1)
+    # get_lowest_energies('many_islands_interaction.out/table.txt', 3, verbose=False)
     # get_lowest_energies('many_islands_interaction.out/table.txt', 4, verbose=False)
     # get_lowest_energies('many_islands_interaction.out/table.txt', 6, verbose=False)
     # mag_angles, energies, geom_angles = process_data('many_islands_interaction.out/table.txt')
@@ -257,3 +271,5 @@ if __name__ == "__main__":
     # get_lowest_energies('attempts/table000006.txt', 1, verbose=False)
     # check_if_halfadder('attempts/table000006.txt')
     # plot_energy_levels('attempts/table000006.txt', 1)
+    # plot_energy_levels('attempts/table000010.txt', 3)
+    # plot_energy_levels('attempts/table000012.txt', 1)
