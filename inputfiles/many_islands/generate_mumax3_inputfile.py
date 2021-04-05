@@ -106,6 +106,7 @@ def generate_mumax3_inputfile(grid, islands, rho=None, L=None):
     text = text.replace(r'@{DefRegion}', defregion_text)
     # external field for fixed islands
     extfield_text = '\n'.join([('B_ext.setRegion(%d, Vector(cos(angle%d), sin(angle%d), 0).Mul(fixationField))' % (i+1,i+1,i+1)) for i, island in enumerate(islands) if island.fixed])
+    extfield_text += '\n' + '\n'.join([('m.setRegion(%d, Uniform(cos(angle%d), sin(angle%d), 0))' % (i+1,i+1,i+1)) for i, island in enumerate(islands) if island.fixed])
     text = text.replace(r'@{B_ext}', extfield_text)
     # table columns
     table_an_text = '\n'.join([('TableAddVar(a%d, "a%d", "rad")' % (i+1, i+1)) for i, island in enumerate(islands)])
@@ -129,7 +130,12 @@ def generate_mumax3_inputfile(grid, islands, rho=None, L=None):
 
 
 if __name__ == "__main__":
-    # generate_mumax3_inputfile(2, [
+    generate_mumax3_inputfile(2, [ # Basic half adder
+        Island(-128, 0, 0),
+        Island(0, 0, 0),
+        Island(20, -180, pi/2, fixed=True)
+    ], rho=0.66, L=100)
+    # generate_mumax3_inputfile(2, [ # Basic half adder (with long wires that dont work)
     #     Island(-128, 0, 0),
     #     Island(0, 0, 0),
     #     Island(20, -156, pi/2, fixed=True),
@@ -138,9 +144,15 @@ if __name__ == "__main__":
     #     Island(-128, 256, 0),
     #     Island(180, 180, 0)
     # ], rho=0.66, L=100)
-    generate_mumax3_inputfile(2, [
-        Island(0, 0, pi/4),
-        Island(90, -90, 0),
-        Island(-90, -90, 0),
-        Island(0, -180, pi/4)
-    ], rho=0.66, L=100)
+    # generate_mumax3_inputfile(2, [ # Rhombic half adder shape (with smol wire)
+    #     Island(0, 0, pi/4),
+    #     Island(90, -90, 0),
+    #     Island(-90, -90, 0),
+    #     Island(0, -180, pi/4),
+    #     Island(-180, -180, 0)
+    # ], rho=0.66, L=100)
+    # generate_mumax3_inputfile(2, [ # Small test for input on rhombic half adder
+    #     Island(-90, -90, 0),
+    #     Island(0, -180, pi/4),
+    #     Island(-180, -180, 0)
+    # ], rho=0.66, L=100)
