@@ -14,7 +14,6 @@ Ly := cellSize*Ny
 print("Simulation area:", Lx, "by", Ly)
 
 //// Material parameters
-Msat = 800e3
 Aex = 13e-12
 print("Exchange length:", Sqrt((2*Aex.GetRegion(0))/(mu0*Pow(Msat.GetRegion(0), 2)))) // 5.6858e-9 so ok to use Nz = 1 for 5e-9 thickness
 
@@ -34,6 +33,7 @@ SetGeom(geometry)
 
 // GEOM: Here define region for all islands
 @{DefRegion}
+@{SetRegion}
 Save(regions)
 
 fixationField := 1

@@ -9,8 +9,9 @@ from math import pi
 class Island:
     rho = 0.66
     L = 100
+    Msat = 800e3
 
-    def __init__(self, x, y, a, fixed=False, rho=None, L=None):
+    def __init__(self, x, y, a, fixed=False, rho=None, L=None, Msat=None):
         '''
             @param x [nm]: X position of the island.
             @param y [nm]: Y position of the island.
@@ -25,24 +26,27 @@ class Island:
         self.fixed = fixed
         self.rho = rho
         self.L = L
+        self.Msat = Msat
     
     def init_geom(self):
         self.rho = Island.rho if self.rho is None else self.rho
         self.L = Island.L if self.L is None else self.L
+        self.Msat = Island.Msat if self.Msat is None else self.Msat
 
-    def set_geom(self, rho=None, L=None):
+    def set_geom(self, rho=None, L=None, Msat=None):
         self.rho = Island.rho if rho is None else rho
         self.L = Island.L if L is None else L
+        self.Msat = Island.Msat if Msat is None else Msat
     
     def move(self, dx, dy):
         self.x += dx
         self.y += dy
     
     def __str__(self):
-        return f"'x':{self.x}, 'y':{self.y}, 'a':{self.a}, 'fixed':{self.fixed}, 'rho':{self.rho}, 'L':{self.L}"
+        return f"'x':{self.x}, 'y':{self.y}, 'a':{self.a}, 'fixed':{self.fixed}, 'rho':{self.rho}, 'L':{self.L}, 'Msat':{self.Msat}"
 
 
-def generate_mumax3_inputfile(grid, islands, rho=None, L=None):
+def generate_mumax3_inputfile(grid, islands, rho=None, L=None, Msat=None):
     '''
         @param grid [nm]: Size of a grid cell, in all dimensions.
         @param islands [list]: List of all Islands in the simulation.
@@ -61,6 +65,10 @@ def generate_mumax3_inputfile(grid, islands, rho=None, L=None):
         for island in islands:
             if island.L is None:
                 island.L = L
+    if Msat is not None:
+        for island in islands:
+            if island.Msat is None:
+                island.Msat = Msat
     for island in islands:
         island.init_geom() # VERY IMPORTANT OTHERWISE rho AND L ARE None !!!
     
@@ -104,6 +112,8 @@ def generate_mumax3_inputfile(grid, islands, rho=None, L=None):
     # regions
     defregion_text = '\n'.join([('DefRegion(%d, island%d)' % (i+1, i+1)) for i, _ in enumerate(islands)])
     text = text.replace(r'@{DefRegion}', defregion_text)
+    setregion_text = '\n'.join([('Msat.SetRegion(%d, %.2e)' % (i+1, island.Msat)) for i, island in enumerate(islands)])
+    text = text.replace(r'@{SetRegion}', setregion_text)
     # external field for fixed islands
     extfield_text = '\n'.join([('B_ext.setRegion(%d, Vector(cos(angle%d), sin(angle%d), 0).Mul(fixationField))' % (i+1,i+1,i+1)) for i, island in enumerate(islands) if island.fixed])
     extfield_text += '\n' + '\n'.join([('m.setRegion(%d, Uniform(cos(angle%d), sin(angle%d), 0))' % (i+1,i+1,i+1)) for i, island in enumerate(islands) if island.fixed])

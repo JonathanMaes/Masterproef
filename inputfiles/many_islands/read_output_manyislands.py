@@ -154,8 +154,9 @@ def get_lowest_energies(filename, input_island, verbose=True):
         else:
             minEnergies.append(new_energies[0])
             minEnergyMagAngles.append(new_mag_angles[0])
-            if abs(new_energies[0] - new_energies[1]) < 1e-4:
-                print('Input island %d at %d deg is DEGENERATE!' % (input_island, geom_angles[input_island-1]+i*90))
+            if len(new_energies) > 1:
+                if abs(new_energies[0] - new_energies[1]) < 1e-4:
+                    print('Input island %d at %d deg is DEGENERATE!' % (input_island, geom_angles[input_island-1]+i*90))
 
     if not verbose:
         print('For island %d:' % input_island)
@@ -271,5 +272,6 @@ if __name__ == "__main__":
     # get_lowest_energies('attempts/table000006.txt', 1, verbose=False)
     # check_if_halfadder('attempts/table000006.txt')
     # plot_energy_levels('attempts/table000006.txt', 1)
+    # check_if_halfadder('attempts/table000008.txt')
     # plot_energy_levels('attempts/table000010.txt', 3)
     # plot_energy_levels('attempts/table000012.txt', 1)
