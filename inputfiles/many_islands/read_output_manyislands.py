@@ -48,15 +48,18 @@ def process_data(filename, sort_energies=True, normalize_energies=True):
             - the corresponding energy
         and also gives the geometry angle of each island.
 
-        @param filename: Relative path to mumax3 table.txt file.
-        @param sort_energies (True): Whether the output energies and corresponding mag_angles should be sorted.
+        @param filename [str/pd.DataFrame]: Relative path to mumax3 table.txt file OR a pandas dataframe object.
+        @param sort_energies [bool] (True): Whether the output energies and corresponding mag_angles should be sorted.
         @returns tuple(3):
             mag_angles [deg]: List of lists, with each sublist being one a{n} situation. Element {n} of a sublist is the relaxed m angle of island {n} for that situation.
             energies [eV]: List, with element n being the energy corresponding to mag_angles[n] relaxed configuration.
             geom_angles [deg]: The angle under which each geometry is rotated, in order.
             All these include fixed islands, and energies are not normalized to the minimum one.
     '''
-    table = read_mumax3_table(filename)
+    if isinstance(filename, str):
+        table = read_mumax3_table(filename)
+    elif isinstance(filename, pd.DataFrame):
+        table = filename
     num_islands = 0
     for name in table.columns:
         # If column is of form "m.region{n}x"
@@ -122,7 +125,7 @@ def collect_orientation(island, angle, mag_angles, energies, geom_angles, margin
 # - Extra function to plot energies corresponding to a certain input for a certain island
 # - Perhaps with nice GUI but that might be a lot of work
 
-def get_lowest_energies(filename, input_island, verbose=True):
+def get_lowest_energies(filename, input_island, verbose=False):
     '''
         For the mumax3 table file at <filename>, this function lists the minimal energy configuration
         for each of 4 possible input bits if one considers island <input_island> to be the input island.
@@ -130,9 +133,9 @@ def get_lowest_energies(filename, input_island, verbose=True):
         the input island. This element is then a list containing the relaxed magnetization angles of the
         lowest energy state for which island <input_island> is at an angle corresponding to that input bit.
 
-        @param filename [str]: Relative path to mumax3 table.txt file.
+        @param filename [str/pd.DataFrame]: Relative path to mumax3 table.txt file OR a pandas dataframe object.
         @param input_island [int]: The island that is considered the 'input island'.
-        @param verbose [bool] (True): Whether to print the @returns content to the terminal or not.
+        @param verbose [bool] (False): If true, the @returns content is printed to the terminal as well.
         @returns: - None if no stable configurations exist for some angle of input_island, for example because
                     the island is fixed (then no stable configurations exist for any angle that is not the fixation direction)
                   - Otherwise, returns (minEnergyMagAngles, minEnergies), where
@@ -149,7 +152,8 @@ def get_lowest_energies(filename, input_island, verbose=True):
         new_mag_angles, new_energies = collect_orientation(input_island, geom_angles[input_island-1]+i*90, mag_angles, energies, geom_angles)
 
         if len(new_energies) == 0: # No stable configurations for <input_island> at geom_angles[i]
-            print('Island %d does not have a stable orientation around %d degrees.' % (input_island, geom_angles[input_island-1]+i*90))
+            if verbose:
+                print('Island %d does not have a stable orientation around %d degrees.' % (input_island, geom_angles[input_island-1]+i*90))
             return (None, None)
         else:
             minEnergies.append(new_energies[0])
@@ -158,21 +162,22 @@ def get_lowest_energies(filename, input_island, verbose=True):
                 if abs(new_energies[0] - new_energies[1]) < 1e-4:
                     print('Input island %d at %d deg is DEGENERATE!' % (input_island, geom_angles[input_island-1]+i*90))
 
-    if not verbose:
+    if verbose:
         print('For island %d:' % input_island)
         print(' Lowest energies: \n %s' % minEnergies)
         print(' Stable angles: \n %s' % np.array(minEnergyMagAngles))
     return (np.array(minEnergyMagAngles), np.array(minEnergies))
 
-def check_if_halfadder(filename, allow_rotation=False):
+def check_if_halfadder(filename, allow_rotation=False, verbose=True):
     """
         For a given mumax3 table file at <filename>, this function looks if there is a half adder
         possible with the relaxed magnetizations from the table file.
 
-        @param filename [str]: Relative path to mumax3 table.txt file.
+        @param filename [str/pd.DataFrame]: Relative path to mumax3 table.txt file OR a pandas dataframe object.
         @param allow_rotation [bool] (False): If true, the search does not care about the orientation of input
                                               and output with respect to each other, so this allows for 45°
                                               difference to be neglected. TODO!
+        @param verbose [bool] (True): If false, no output is printed to console.
         @returns: - False if no half adder was found.
                   - (i, j, angles_i, input_bits), where
                     i: Index of input island.
@@ -184,7 +189,8 @@ def check_if_halfadder(filename, allow_rotation=False):
     halfAdder = {0:0,1:1,2:1,3:2}
     found_halfadders = []
     for i in range(len(geom_angles)): # Input island <i>
-        print('Checking if island %d can be an input...' % (i+1))
+        if verbose:
+            print('Checking if island %d can be an input...' % (i+1))
         minEnergyMagAngles, _ = get_lowest_energies(filename, i+1)
         if minEnergyMagAngles is None: # Then no stable configurations exist for some angle of input <i> (e.g. because island <i> is fixed)
             continue
@@ -206,16 +212,16 @@ def check_if_halfadder(filename, allow_rotation=False):
                 should_be_output_bits = list(map(halfAdder.get, input_bits))
                 output_bits = list(map(d.get, angles_j))
                 if should_be_output_bits == output_bits:
-                    print("Half adder found for %s!" % filename)
-                    print("Input island %d, output island %d, where" % (i+1, j+1))
-                    print("angles %s correspond to %s." % (list(angles_i), input_bits))
-                    print("#"*80)
                     found_halfadders.append((i, j, angles_i, input_bits))
+                    if verbose:
+                        print("Half adder found for %s!" % filename)
+                        print("Input island %d, output island %d, where" % (i+1, j+1))
+                        print("angles %s correspond to %s." % (list(angles_i), input_bits))
+                        print("#"*80)
     return found_halfadders
 
 
 # TODO: write function that plots the low energies, given a certain input island.
-# 
 def plot_energy_levels(filename, input_island, trunc=5):
     '''
         Shows a matplotlib plot, with four lines in it. Each line corresponds to the
@@ -225,7 +231,7 @@ def plot_energy_levels(filename, input_island, trunc=5):
         You see, if one of these plot lines is too flat, it is easy for the geometry to go into
         this other, slightly higher energy state, which is of course undesirable.
 
-        @param filename [str]: Relative path to mumax3 table.txt file.
+        @param filename [str/pd.DataFrame]: Relative path to mumax3 table.txt file OR a pandas dataframe object.
         @param input_island [int]: The island that is considered the 'input island'.
         @param trunc [int] (5): Maximum amount of lowest-lying-energy-levels that are plotted/printed.
     '''
@@ -261,15 +267,15 @@ if __name__ == "__main__":
 
     check_if_halfadder('many_islands_interaction.out/table.txt')
     plot_energy_levels('many_islands_interaction.out/table.txt', 1)
-    # get_lowest_energies('many_islands_interaction.out/table.txt', 3, verbose=False)
-    # get_lowest_energies('many_islands_interaction.out/table.txt', 4, verbose=False)
-    # get_lowest_energies('many_islands_interaction.out/table.txt', 6, verbose=False)
+    # get_lowest_energies('many_islands_interaction.out/table.txt', 3, verbose=True)
+    # get_lowest_energies('many_islands_interaction.out/table.txt', 4, verbose=True)
+    # get_lowest_energies('many_islands_interaction.out/table.txt', 6, verbose=True)
     # mag_angles, energies, geom_angles = process_data('many_islands_interaction.out/table.txt')
     # collect_orientation(1, 0, mag_angles, energies, geom_angles)
 
     # mag_angles, energies, geom_angles = process_data('attempts/table000006.txt')
     # collect_orientation(1, 0, mag_angles, energies, geom_angles)
-    # get_lowest_energies('attempts/table000006.txt', 1, verbose=False)
+    # get_lowest_energies('attempts/table000006.txt', 1, verbose=True)
     # check_if_halfadder('attempts/table000006.txt')
     # plot_energy_levels('attempts/table000006.txt', 1)
     # check_if_halfadder('attempts/table000008.txt')
