@@ -52,6 +52,7 @@ TableAdd(E_Zeeman) // Zeeman only takes into account B_ext, and thus the fixatio
 
 @{TableAddGlobals}
 TableAddVar(cellSize, "Cell_size", "m")
+@{TableAddExtra}
 
 //// Many nested loops
 // GEOM: A loop for each island that is NOT fixed
