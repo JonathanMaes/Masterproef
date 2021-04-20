@@ -19,6 +19,7 @@ class Island:
             @param fixed [bool] (False): Whether the magnetization is fixed at <a>.
             @param rho [-] (Island.rho): The roundness of the island.
             @param L [nm] (Island.L): The major axis of the ellipses constituting the island.
+            @param Msat [A/m] (Island.Msat): Saturation magnetization of the island.
         '''
         self.x = x
         self.y = y
@@ -43,19 +44,22 @@ class Island:
         self.y += dy
     
     def __str__(self):
-        return f"'x':{self.x}, 'y':{self.y}, 'a':{self.a}, 'fixed':{self.fixed}, 'rho':{self.rho}, 'L':{self.L}, 'Msat':{self.Msat}"
+        return "'x':%s, 'y':%s, 'a':%s, 'fixed':%s, 'rho':%s, 'L':%s, 'Msat':%s" % (self.x, self.y, self.a, self.fixed, self.rho, self.L, self.Msat)
 
 
-def generate_mumax3_inputfile(grid, islands, rho=None, L=None, Msat=None):
+def generate_mumax3_inputfile(grid, islands, rho=None, L=None, Msat=None, extra_columns=None):
     '''
         @param grid [nm]: Size of a grid cell, in all dimensions.
         @param islands [list]: List of all Islands in the simulation.
         @param rho [-] (Island.rho): Roundness of all islands.
-        @param L [nm] (Island.rho): Major axis of ellipses constituting the islands.
+        @param L [nm] (Island.L): Major axis of ellipses constituting the islands.
+        @param Msat [A/m] (Island.Msat): Saturation magnetization of all islands.
+        @param extra_columns [dict]: Dictionary <key>:<value>, with <key> of the form "name [unit]" (spacing is important).
+            <value> is saved in the mumax3 table.txt as a column containing just this value, with column header <key>.
 
-        If rho or L is specified in the Island __init__ call, then those are used. If not, then the values passed
-            to generate_mumax3_inputfile are used. If those are not specified either, the default Island.rho and
-            Island.L from the class Island are used.
+        If rho, L or Msat is specified in the Island __init__ call, then those are used. If not, 
+            then the values passed to generate_mumax3_inputfile are used. If those are not 
+            specified either, the default properties from the class Island are used.
     '''
     if rho is not None:
         for island in islands:
@@ -70,7 +74,7 @@ def generate_mumax3_inputfile(grid, islands, rho=None, L=None, Msat=None):
             if island.Msat is None:
                 island.Msat = Msat
     for island in islands:
-        island.init_geom() # VERY IMPORTANT OTHERWISE rho AND L ARE None !!!
+        island.init_geom() # VERY IMPORTANT OTHERWISE rho AND L AND Msat ARE None !!!
     
     #### Determine the simulation area
     # Simulation side lengths rounded to nearest power of two
@@ -129,6 +133,11 @@ def generate_mumax3_inputfile(grid, islands, rho=None, L=None, Msat=None):
     if L is not None:
         table_globals_text += 'TableAddVar(%.3f, "size", "m")\n' % L
     text = text.replace(r'@{TableAddGlobals}', table_globals_text)
+    if extra_columns:
+        table_extra_text = '\n'.join(['TableAddVar(%s, "%s", "%s")' % (value, key.split(' ')[0], key.split(' ')[-1][1:-1]) for key, value in sorted(extra_columns.items())])
+    else:
+        table_extra_text = ''
+    text = text.replace(r'@{TableAddExtra}', table_extra_text)
     # loops
     loops_text = '\n'.join([('for a%d=angle%d; a%d < 2*Pi+angle%d; a%d += Pi/2 {' % (i+1,i+1,i+1,i+1,i+1)) for i, island in enumerate(islands) if not island.fixed])
     inside_text = '\n'.join([('    m.setRegion(%d, Uniform(1,0,0).rotZ(a%d))' % (i+1,i+1)) for i, island in enumerate(islands) if not island.fixed])
