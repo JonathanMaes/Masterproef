@@ -25,7 +25,7 @@ if __name__ == "__main__":
     inFileName = 'biaxial_island_shape.out/tablePlus_100_0.1-1.txt' #! set GROUP_BY to "Cell_size" for this one
     # inFileName = 'biaxial_island_shape.out/tablePlus_32-128_0.1-1_aPi4_B0.001_cell1nm.txt' #! set GROUP_BY to "Size" for this one
     # inFileName = 'biaxial_island_shape.out/tablePlus_100_0.1-1_aPi4_B0.001_cell3.125nm.txt'
-    inFileName = 'biaxial_island_shape.out/tablePlus_100_0.1-1_aPi128_B0.01_cell4nm.txt'
+    inFileName = 'biaxial_island_shape.out/tablePlus_100_0.1-1_aPi128_B0.01_cell4nm.txt' # Those with aPi128 include the second-order anisotropy, at the cost of using a higher field.
     inFileName = 'biaxial_island_shape.out/table.txt'
     outDir = 'Figures/Barrier'
     if not os.path.exists(outDir):
