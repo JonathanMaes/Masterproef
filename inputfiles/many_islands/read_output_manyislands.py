@@ -180,9 +180,9 @@ def check_if_halfadder(filename, allow_rotation=False, verbose=True):
         @param verbose [bool] (True): If false, no output is printed to console.
         @returns: - False if no half adder was found.
                   - (i, j, angles_i, input_bits), where
-                    i: Index of input island.
-                    j: Index of output island.
-                    angles_i: The four stable angles for the input island magnetization.
+                    i: Index of input island, starting at 1.
+                    j: Index of output island, starting at 1.
+                    angles_i: The four stable angles for the input island magnetization, between -180° and 180°.
                     input_bits: The bit associated with each magnetization angle in angles_i.
     """
     _, _, geom_angles = process_data(filename)
@@ -212,7 +212,7 @@ def check_if_halfadder(filename, allow_rotation=False, verbose=True):
                 should_be_output_bits = list(map(halfAdder.get, input_bits))
                 output_bits = list(map(d.get, angles_j))
                 if should_be_output_bits == output_bits:
-                    found_halfadders.append((i, j, angles_i, input_bits))
+                    found_halfadders.append((i+1, j+1, angles_i, input_bits))
                     if verbose:
                         print("Half adder found for %s!" % filename)
                         print("Input island %d, output island %d, where" % (i+1, j+1))
