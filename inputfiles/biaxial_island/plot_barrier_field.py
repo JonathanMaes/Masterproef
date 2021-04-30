@@ -22,13 +22,19 @@ def read_mumax3_table(filename):
     return table
 
 if __name__ == "__main__":
-    SAVE1 = True
-    SAVE2 = False
+    SAVE1 = False
+    SUBTRACT_FIRSTORDER_SINE = True # If True, then a sine is subtracted such that 0° and 45° have same energy in plot
     USE_ELECTRONVOLT = True
     USE_RELAXED_ANGLE = True
-    
+    SHOW2 = False
+    SAVE2 = False
+
     # inFileName = 'biaxial_island_shape_field.out/tablePlus_65_B25-0.001-div4_a128Pi_plotOptimized.txt'
-    inFileName = 'biaxial_island_shape_field.out/tablePlus_48.2_B25-0.001-div4_a128Pi_plotOptimized.txt'
+    # inFileName = 'biaxial_island_shape_field.out/tablePlus_48.2_B25-0.001-div4_a128Pi_plotOptimized.txt'
+    # inFileName = 'biaxial_island_shape_field.out/tablePlus_49_B100-0.001-div4_a128Pi_cell4nm.txt'
+    # inFileName = 'biaxial_island_shape_field.out/tablePlus_49_B100-0.001-div4_a128Pi_cell1nm.txt'
+    # inFileName = 'biaxial_island_shape_field.out/tablePlus_50.5_B100-0.001-div4_a128Pi_cell2nm.txt'
+    inFileName = 'biaxial_island_shape_field.out/tablePlus_30_B25-0.005-div4_a128Pi_cell1nm.txt'
     outDir1 = 'Figures/BarrierLandscape'
     if not os.path.exists(outDir1):
         os.makedirs(outDir1)
@@ -60,6 +66,16 @@ if __name__ == "__main__":
                 fancyAngles = np.append([angles.iloc[0]], angles.iloc[1:] + offset)
                 angles = fancyAngles
             
+            if SUBTRACT_FIRSTORDER_SINE:
+                # Find index closest to 0°
+                index_0 = (np.abs(subtable["my"])).idxmin()
+                # Find index closest to 45°
+                index_45 = (np.abs(np.abs(subtable["my"]) - np.sqrt(2)/2)).idxmin()
+                # Energy barrier only taking 0° and 45° into account
+                barrier = E_demag[index_45] - E_demag[index_0]
+                E_demag -= (1 - np.cos(angles/180*np.pi*4))/2*barrier
+                print("(%.3f T) 8-fold energy barrier: %.2e %s" % (field, max(E_demag) - min(E_demag), 'eV' if USE_ELECTRONVOLT else 'J'))
+
             angles, E_demag = zip(*sorted(zip(angles, E_demag))) # Sort angles
             plt.scatter(angles, E_demag) # Energy as function of relaxed magnetization angle
         else: 
@@ -87,25 +103,26 @@ if __name__ == "__main__":
     plt.show()
 
 
-    outDir2 = 'Figures/Barrier'
-    if not os.path.exists(outDir2):
-        os.makedirs(outDir2)
-    outFileName2 = os.path.join(outDir2, 'Field' + os.path.splitext(os.path.basename(inFileName).split('table')[-1])[0]) + '.pdf'
+    if SHOW2:
+        outDir2 = 'Figures/Barrier'
+        if not os.path.exists(outDir2):
+            os.makedirs(outDir2)
+        outFileName2 = os.path.join(outDir2, 'Field' + os.path.splitext(os.path.basename(inFileName).split('table')[-1])[0]) + '.pdf'
 
-    fig = plt.figure(figsize=(8.0, 5.0))
-    # Show trend of E_min and E_max
-    plt.plot(fields, E_min)
-    plt.scatter(fields, E_min)
-    plt.plot(fields, E_max)
-    plt.scatter(fields, E_max)
-    plt.plot(fields, E_barrier)
-    plt.scatter(fields, E_barrier)
-    plt.legend([r'$E_{min}$', r'$E_{max}$', r'$E_{barrier}$'])
-    plt.xscale("log")
-    plt.xlabel(r"$B_{ext}$ [T]")
-    plt.ylabel(r"Energy barrier [%s]" % ('eV' if USE_ELECTRONVOLT else 'J'))
-    plt.title(r"65x100 nm double-ellipse")
-    plt.gcf().tight_layout()
-    if SAVE2:
-        plt.savefig(outFileName2)
-    plt.show()
+        fig = plt.figure(figsize=(8.0, 5.0))
+        # Show trend of E_min and E_max
+        plt.plot(fields, E_min)
+        plt.scatter(fields, E_min)
+        plt.plot(fields, E_max)
+        plt.scatter(fields, E_max)
+        plt.plot(fields, E_barrier)
+        plt.scatter(fields, E_barrier)
+        plt.legend([r'$E_{min}$', r'$E_{max}$', r'$E_{barrier}$'])
+        plt.xscale("log")
+        plt.xlabel(r"$B_{ext}$ [T]")
+        plt.ylabel(r"Energy barrier [%s]" % ('eV' if USE_ELECTRONVOLT else 'J'))
+        plt.title(r"65x100 nm double-ellipse")
+        plt.gcf().tight_layout()
+        if SAVE2:
+            plt.savefig(outFileName2)
+        plt.show()
