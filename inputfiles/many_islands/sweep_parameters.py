@@ -145,14 +145,18 @@ def plot_sweep(sweepfile, swap_axes=False, do=('types', 'balanced1')):
     halfadder_types = []
     halfadder_type_grid = np.zeros_like(is_halfadder_grid) # Zero if no half adder, 1 corresponds to halfadder_types[0], 2 to halfadder_types[1], ...
     balance1_grid = np.zeros_like(is_halfadder_grid)
+    balance1_grid[:] = np.nan
+    balance2_grid = np.zeros_like(is_halfadder_grid)
+    balance2_grid[:] = np.nan
     for i, subset in enumerate(table.groupby(var1_colstart + var1_name, sort=True)):
         subtable = subset[1] # Element 0 is the value of var1 in this loop
         for j, subsubset in enumerate(subtable.groupby(var2_colstart + var2_name, sort=True)):
             subsubtable = subsubset[1] # Element 0 is the value of var2 in this loop
             halfadders = check_if_halfadder(subsubtable, verbose=False)
+            print(halfadders)
             if len(halfadders) != 0:
                 # Do everything that has to do with being a half adder or not, and the type of halfadder (which is input? angles in which order?)
-                input_idx, output_idx, angles_i, input_bits = halfadders[0] # TODO: get energies somehow
+                input_idx, output_idx, angles_i, input_bits = halfadders[0]
                 input_bits = [x for _, x in sorted(zip(angles_i, input_bits))] # Sort input bits in the same manner as angles_i
                 angles_i = sorted(angles_i)
                 input_bits = input_bits[2:] + input_bits[:2] # Make angles start at or above 0 instead of -180°
@@ -167,10 +171,17 @@ def plot_sweep(sweepfile, swap_axes=False, do=('types', 'balanced1')):
                 # Do everything that has to do with energies
                 mag_angles, energies, geom_angles = process_data(subsubtable)
                 input_island = input_idx
+                all_energies = []
+                largest_collection = 0
                 for a in range(4):
                     angle = geom_angles[input_island-1]+a*90
                     collected_mag_angles, collected_energies = collect_orientation(input_island, angle, mag_angles, energies, geom_angles)
-                balance1_grid[i][j] = 0 # TODO
+                    all_energies.append(collected_energies)
+                    largest_collection = max(largest_collection, len(collected_energies))
+                all_energies = np.array([list(l) + [np.infty]*(largest_collection - len(l)) for l in all_energies])
+                balance1_grid[i][j] = np.min(all_energies[:,1]) - np.max(all_energies[:,0])
+                balance2_grid[i][j] = np.max(all_energies[:,0]) - np.min(all_energies[:,0])
+                # balance1_grid[i][j] = np.max()
     
     n_types = len(halfadder_types)
     # Sort the types numbering so they are not in a weird order. This only affects the behind-the-scenes numbering of the types, not the halfadders themselves.
@@ -224,37 +235,39 @@ def plot_sweep(sweepfile, swap_axes=False, do=('types', 'balanced1')):
         plt.savefig(os.path.join(outDir, os.path.split(sweepfile)[1].replace('.txt', '_types.pdf')))
         plt.show()
     
-    ## Plot the type of half adder e.g. (0, 2, 1, 3)
-    if 'balanced1' in do:
-        fig = plt.figure(figsize=(7.0, 5.0))
-        ax = fig.add_subplot(111)
+    ## Plot the balancedness
+    for i in [1,2]:
+        if f'balanced{i}' in do:
+            fig = plt.figure(figsize=(7.0, 5.0))
+            ax = fig.add_subplot(111)
 
-        plot_grid = np.transpose(halfadder_type_grid)
-        im = ax.imshow(plot_grid, vmin=0, vmax=n_types+1, origin='lower', interpolation='nearest', cmap=cm.get_cmap('inferno'), extent=extent) #, vmin=0, vmax=1
-        cbar = fig.colorbar(im)
-        # cbar.set_label('Is half adder?', rotation=270, labelpad=25)
+            plot_grid = np.transpose(eval(f"balance{i}_grid")) # eval is bad practice but idc
+            im = ax.imshow(plot_grid,  origin='lower', interpolation='nearest', cmap=cm.get_cmap('inferno'), extent=extent) #, vmin=0, vmax=n_types+1,
+            cbar = fig.colorbar(im)
+            cbar.set_label(f'Balanced? (rule {i})', rotation=270, labelpad=25)
 
-        if var1_sweeped and var2_sweeped: # Stretch figure to fit pdf nicely if both vars sweeped, but keep square pixels otherwise.
-            ax.set_aspect('auto')
-        if var1_sweeped:
-            plt.xlabel(var1_name + ' [%s]' % var1_unit)
-        else:
-            plt.xticks([])
-        if var2_sweeped:
-            plt.ylabel(var2_name + ' [%s]' % var2_unit)
-        else:
-            plt.yticks([])
-        
-        draw_contour(ax, color='b', alpha=1)
+            if var1_sweeped and var2_sweeped: # Stretch figure to fit pdf nicely if both vars sweeped, but keep square pixels otherwise.
+                ax.set_aspect('auto')
+            if var1_sweeped:
+                plt.xlabel(var1_name + ' [%s]' % var1_unit)
+            else:
+                plt.xticks([])
+            if var2_sweeped:
+                plt.ylabel(var2_name + ' [%s]' % var2_unit)
+            else:
+                plt.yticks([])
+            
+            draw_contour(ax, color='black', alpha=1)
 
-        plt.gcf().subplots_adjust(bottom=0.15, left=0.15, right=0.95)
-        plt.gcf().tight_layout()
-        plt.savefig(os.path.join(outDir, os.path.split(sweepfile)[1].replace('.txt', '_balanced1.pdf')))
-        plt.show()
+            plt.gcf().subplots_adjust(bottom=0.15, left=0.15, right=0.95)
+            plt.gcf().tight_layout()
+            plt.savefig(os.path.join(outDir, os.path.split(sweepfile)[1].replace('.txt', f'_balanced{i}.pdf')))
+            plt.show()
 
 
 
 if __name__ == "__main__":
-    plot_sweep('Results/Sweeps/Sweep_000006/table(d100-220_10,s-100-100_10).txt', swap_axes=True, do=('types'))
+    # plot_sweep('Results/Sweeps/Sweep_000006/table(d100-220_10,s-100-100_10).txt', swap_axes=True, do=('types'))
     # plot_sweep('Results/Sweeps/Sweep_000006/table(d100-220_10,s-100-100_10).txt', swap_axes=True, do=('balanced1'))
+    plot_sweep('Results/Sweeps/Sweep_000006/table(d100-220_10,s-100-100_10).txt', swap_axes=True, do=('balanced2'))
     # plot_sweep('Results/Sweeps/Sweep_000006/table(d100-210_2,s20).txt')
