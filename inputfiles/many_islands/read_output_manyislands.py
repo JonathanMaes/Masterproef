@@ -194,7 +194,7 @@ def check_if_halfadder(filename, allow_rotation=False, verbose=True):
         minEnergyMagAngles, _ = get_lowest_energies(filename, i+1)
         if minEnergyMagAngles is None: # Then no stable configurations exist for some angle of input <i> (e.g. because island <i> is fixed)
             continue
-        angles_i = anglediff(0, round_90(minEnergyMagAngles[:,i].T, delta=geom_angles[i]))
+        angles_i = anglediff(round_90(minEnergyMagAngles[:,i].T, delta=geom_angles[i]), 0)
         if np.all(np.array(angles_i) == angles_i[0]): # Then island <i> is fixed
             continue
         for j in range(len(geom_angles)): # Output island <j>
@@ -203,7 +203,7 @@ def check_if_halfadder(filename, allow_rotation=False, verbose=True):
             if not allow_rotation:
                 if geom_angles[i] != geom_angles[j]: # If not same orientation, then skip
                     continue
-            angles_j = anglediff(0, round_90(minEnergyMagAngles[:,j].T, delta=geom_angles[j]))
+            angles_j = anglediff(round_90(minEnergyMagAngles[:,j].T, delta=geom_angles[j]), 0)
             if np.all(np.array(angles_j) == angles_j[0]): # Then island <j> is fixed
                 continue
             for perm in itertools.permutations([0,1,2,3]):
@@ -265,8 +265,8 @@ if __name__ == "__main__":
     # convert_ovf('many_islands_interaction.out')
     # print('#'*80)
 
-    check_if_halfadder('many_islands_interaction.out/table.txt')
-    plot_energy_levels('many_islands_interaction.out/table.txt', 1)
+    # check_if_halfadder('many_islands_interaction.out/table.txt')
+    # plot_energy_levels('many_islands_interaction.out/table.txt', 1)
     # get_lowest_energies('many_islands_interaction.out/table.txt', 3, verbose=True)
     # get_lowest_energies('many_islands_interaction.out/table.txt', 4, verbose=True)
     # get_lowest_energies('many_islands_interaction.out/table.txt', 6, verbose=True)
@@ -276,7 +276,7 @@ if __name__ == "__main__":
     # mag_angles, energies, geom_angles = process_data('attempts/table000006.txt')
     # collect_orientation(1, 0, mag_angles, energies, geom_angles)
     # get_lowest_energies('attempts/table000006.txt', 1, verbose=True)
-    # check_if_halfadder('attempts/table000006.txt')
+    check_if_halfadder('attempts/table000006.txt')
     # plot_energy_levels('attempts/table000006.txt', 1)
     # check_if_halfadder('attempts/table000008.txt')
     # plot_energy_levels('attempts/table000010.txt', 3)
