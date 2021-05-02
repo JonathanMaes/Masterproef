@@ -181,7 +181,6 @@ def plot_sweep(sweepfile, swap_axes=False, do=('types', 'balanced1')):
                 all_energies = np.array([list(l) + [np.infty]*(largest_collection - len(l)) for l in all_energies])
                 balance1_grid[i][j] = np.min(all_energies[:,1]) - np.max(all_energies[:,0])
                 balance2_grid[i][j] = np.max(all_energies[:,0]) - np.min(all_energies[:,0])
-                # balance1_grid[i][j] = np.max()
     
     n_types = len(halfadder_types)
     # Sort the types numbering so they are not in a weird order. This only affects the behind-the-scenes numbering of the types, not the halfadders themselves.
@@ -217,14 +216,17 @@ def plot_sweep(sweepfile, swap_axes=False, do=('types', 'balanced1')):
         # for j, lab in enumerate(halfadder_types): # Put half adder type INSIDE the colorbar, but then text is quite smol
         #     cbar.ax.text(1.5, 1.5 + j, lab, ha='center', va='center', rotation=270, size=10)
 
+        ax.tick_params(axis='both', which='major', length=8)
         if var1_sweeped and var2_sweeped: # Stretch figure to fit pdf nicely if both vars sweeped, but keep square pixels otherwise.
             ax.set_aspect('auto')
         if var1_sweeped:
             plt.xlabel(var1_name + ' [%s]' % var1_unit)
+            ax.set_xticks(var1_range, minor=True)
         else:
             plt.xticks([])
         if var2_sweeped:
             plt.ylabel(var2_name + ' [%s]' % var2_unit)
+            ax.set_yticks(var2_range, minor=True)
         else:
             plt.yticks([])
         
@@ -236,38 +238,75 @@ def plot_sweep(sweepfile, swap_axes=False, do=('types', 'balanced1')):
         plt.show()
     
     ## Plot the balancedness
-    for i in [1,2]:
-        if f'balanced{i}' in do:
-            fig = plt.figure(figsize=(7.0, 5.0))
-            ax = fig.add_subplot(111)
+    if f'balanced1' in do:
+        fig = plt.figure(figsize=(7.0, 5.0))
+        ax = fig.add_subplot(111)
 
-            plot_grid = np.transpose(eval(f"balance{i}_grid")) # eval is bad practice but idc
-            im = ax.imshow(plot_grid,  origin='lower', interpolation='nearest', cmap=cm.get_cmap('inferno'), extent=extent) #, vmin=0, vmax=n_types+1,
-            cbar = fig.colorbar(im)
-            cbar.set_label(f'Balanced? (rule {i})', rotation=270, labelpad=25)
+        plot_grid = np.transpose(balance1_grid) # eval is bad practice but idc
+        im = ax.imshow(plot_grid, vmax=max(0, np.max(plot_grid)), origin='lower', interpolation='nearest', cmap=cm.get_cmap('inferno'), extent=extent)
+        cbar = fig.colorbar(im)
+        cbar.set_label(f'Balanced? (rule 1)', rotation=270, labelpad=25)
 
-            if var1_sweeped and var2_sweeped: # Stretch figure to fit pdf nicely if both vars sweeped, but keep square pixels otherwise.
-                ax.set_aspect('auto')
-            if var1_sweeped:
-                plt.xlabel(var1_name + ' [%s]' % var1_unit)
-            else:
-                plt.xticks([])
-            if var2_sweeped:
-                plt.ylabel(var2_name + ' [%s]' % var2_unit)
-            else:
-                plt.yticks([])
-            
-            draw_contour(ax, color='black', alpha=1)
+        ax.tick_params(axis='both', which='major', length=8)
+        if var1_sweeped and var2_sweeped: # Stretch figure to fit pdf nicely if both vars sweeped, but keep square pixels otherwise.
+            ax.set_aspect('auto')
+        if var1_sweeped:
+            plt.xlabel(var1_name + ' [%s]' % var1_unit)
+            ax.set_xticks(var1_range, minor=True)
+        else:
+            plt.xticks([])
+        if var2_sweeped:
+            plt.ylabel(var2_name + ' [%s]' % var2_unit)
+            ax.set_yticks(var2_range, minor=True)
+        else:
+            plt.yticks([])
+        
+        draw_contour(ax, color='black', alpha=1)
 
-            plt.gcf().subplots_adjust(bottom=0.15, left=0.15, right=0.95)
-            plt.gcf().tight_layout()
-            plt.savefig(os.path.join(outDir, os.path.split(sweepfile)[1].replace('.txt', f'_balanced{i}.pdf')))
-            plt.show()
+        plt.gcf().subplots_adjust(bottom=0.15, left=0.15, right=0.95)
+        plt.gcf().tight_layout()
+        plt.savefig(os.path.join(outDir, os.path.split(sweepfile)[1].replace('.txt', f'_balanced1.pdf')))
+        plt.show()
+    
+    if f'balanced2' in do:
+        fig = plt.figure(figsize=(7.0, 5.0))
+        ax = fig.add_subplot(111)
+
+        plot_grid = np.transpose(balance2_grid) # eval is bad practice but idc
+        im = ax.imshow(plot_grid, vmin=0, origin='lower', interpolation='nearest', cmap=cm.get_cmap('inferno'), extent=extent)
+        cbar = fig.colorbar(im)
+        cbar.set_label(f'Balanced? (rule 2)', rotation=270, labelpad=25)
+
+        ax.tick_params(axis='both', which='major', length=8)
+        if var1_sweeped and var2_sweeped: # Stretch figure to fit pdf nicely if both vars sweeped, but keep square pixels otherwise.
+            ax.set_aspect('auto')
+        if var1_sweeped:
+            plt.xlabel(var1_name + ' [%s]' % var1_unit)
+            ax.set_xticks(var1_range, minor=True)
+        else:
+            plt.xticks([])
+        if var2_sweeped:
+            plt.ylabel(var2_name + ' [%s]' % var2_unit)
+            ax.set_yticks(var2_range, minor=True)
+        else:
+            plt.yticks([])
+        
+        draw_contour(ax, color='black', alpha=1)
+
+        plt.gcf().subplots_adjust(bottom=0.15, left=0.15, right=0.95)
+        plt.gcf().tight_layout()
+        plt.savefig(os.path.join(outDir, os.path.split(sweepfile)[1].replace('.txt', f'_balanced2.pdf')))
+        plt.show()
 
 
 
 if __name__ == "__main__":
-    # plot_sweep('Results/Sweeps/Sweep_000006/table(d100-220_10,s-100-100_10).txt', swap_axes=True, do=('types'))
-    # plot_sweep('Results/Sweeps/Sweep_000006/table(d100-220_10,s-100-100_10).txt', swap_axes=True, do=('balanced1'))
-    plot_sweep('Results/Sweeps/Sweep_000006/table(d100-220_10,s-100-100_10).txt', swap_axes=True, do=('balanced2'))
+    plot_sweep('Results/Sweeps/Sweep_000006/table(d100-210_10,s-100-100_10).txt', swap_axes=True, do=('types'))
+    plot_sweep('Results/Sweeps/Sweep_000006/table(d100-210_10,s-100-100_10).txt', swap_axes=True, do=('balanced1'))
+    plot_sweep('Results/Sweeps/Sweep_000006/table(d100-210_10,s-100-100_10).txt', swap_axes=True, do=('balanced2'))
+
+    # plot_sweep('Results/Sweeps/Sweep_000006/table(d100-200_10,Msat3e5-15e5_1e5).txt', swap_axes=True, do=('types'))
+    # plot_sweep('Results/Sweeps/Sweep_000006/table(d100-200_10,Msat3e5-15e5_1e5).txt', swap_axes=True, do=('balanced1'))
+    # plot_sweep('Results/Sweeps/Sweep_000006/table(d100-200_10,Msat3e5-15e5_1e5).txt', swap_axes=True, do=('balanced2'))
+
     # plot_sweep('Results/Sweeps/Sweep_000006/table(d100-210_2,s20).txt')
