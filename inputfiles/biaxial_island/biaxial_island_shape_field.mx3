@@ -14,7 +14,7 @@ Aex = 13e-12
 print("Exchange length:", Sqrt((2*Aex.GetRegion(0))/(mu0*Pow(Msat.GetRegion(0), 2)))) // 5.6858e-9 so ok to use Nz = 1 for 5e-9 thickness
 
 //// Shape
-geometry := Ellipse(100e-9, 48.2e-9)
+geometry := Ellipse(100e-9, 49e-9)
 geometry = geometry.Add(geometry.RotZ(Pi/2))
 SetGeom(geometry)
 
@@ -23,13 +23,13 @@ TableAdd(E_total)
 TableAdd(E_zeeman)
 angle := 0.0
 angle0 := angle
-tesla := 100.0
+tesla := 25.0
 tesla0 := tesla
 TableAddVar(angle, "Angle", "rad")
 TableAddVar(tesla, "Field", "T")
 
 //// Sweep field strength
-for tesla=tesla0; tesla >= 0.001; tesla = tesla*0.25 {
+for tesla=tesla0; tesla >= 0.005; tesla = tesla*0.25 {
     print(sprintf("Field: %.3f T", tesla))
 
     //// Sweep magnetization angle
