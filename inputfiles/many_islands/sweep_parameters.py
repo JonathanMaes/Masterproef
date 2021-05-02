@@ -67,8 +67,8 @@ def contour_rect(im, extent):
     """ This code is not very efficient, but since the imshows are quite small this is not a problem.
         To plot these lines, use
 
-        for line in lines:
-            plt.plot(line[1], line[0], **kwargs)
+            for line in lines:
+                plt.plot(line[1], line[0], **kwargs)
 
         @param im [list of lists]: The grid that is plotted in the imshow.
         @param extent [list(4)]: List containing [xmin, xmax, ymin, ymax]. This is the same as the imshow 'extent' kwarg.
@@ -95,27 +95,24 @@ def contour_rect(im, extent):
     return lines
 
 def replace_with_dict(ar, dic):
+    ''' Replaces the values of the numpy array <ar> according to the rules in the dictionary <dic>. '''
     k = np.array(list(dic.keys()))
     v = np.array(list(dic.values()))
     sidx = k.argsort()
     return v[sidx[np.searchsorted(k,ar,sorter=sidx)]]
 
-def plot_sweep(sweepfile, swap_axes=False, do=('types', 'balanced1')):
+def plot_sweep(sweepfile, swap_axes=False, do=('types', 'balanced1', 'balanced2'), figsize=(8.0, 5.0)):
     """
         @param sweepfile [str]: The relative path to the "table(var1,var2).txt".
         @param swap_axes [bool] (False): If True, var1 is plotted on the y-axis and var2 on the x-axis.
                                          If False, var1 on the x-axis and var2 on the y-axis, as normal.
-        @param do [tuple] ('types', 'balanced1'): All the actions in this tuple are plotted and shown. These actions are:
+        @param do [tuple] ('types', 'balanced1', 'balanced2'): All the actions in this tuple are plotted and shown. These actions are:
             - 'types': Imshow where the image has several colors, each color corresponding to one type of halfadder.
                        A type of halfadder means which angles correspond to which quaternary number, e.g. (0, 2, 1, 3)
             - 'balanced1': Imshow where min_a(E_{a,1}) - max_a(E_{a,0}) is plotted (diff highest ground state with lowest first excited state).
-            - 'balanced2': Imshow where max_a(E_{a,0}) - min_a(E_{a,0}) is plotted (diff highest ground state with lowest ground state). 
+            - 'balanced2': Imshow where max_a(E_{a,0}) - min_a(E_{a,0}) is plotted (diff highest ground state with lowest ground state).
+        @param figsize [tuple(2)] (7.0, 5.0): The dimensions of the saved figures, in inches. 
     """
-    # Things this function could do:
-    # - Plot the different half adder types with colors and colorbar, to know what each contour means in the other types of plots
-    # - Plot the balancedness type 1: min_a(E_{a,1}) - max_a(E_{a,0})
-    #                         type 2: max_a(E_{a,0}) - min_a(E_{a,0})
-
     if swap_axes:
         var1_colstart = 'var2-'
         var2_colstart = 'var1-'
@@ -175,7 +172,7 @@ def plot_sweep(sweepfile, swap_axes=False, do=('types', 'balanced1')):
                 largest_collection = 0
                 for a in range(4):
                     angle = geom_angles[input_island-1]+a*90
-                    collected_mag_angles, collected_energies = collect_orientation(input_island, angle, mag_angles, energies, geom_angles)
+                    _, collected_energies = collect_orientation(input_island, angle, mag_angles, energies, geom_angles)
                     all_energies.append(collected_energies)
                     largest_collection = max(largest_collection, len(collected_energies))
                 all_energies = np.array([list(l) + [np.infty]*(largest_collection - len(l)) for l in all_energies])
@@ -203,13 +200,13 @@ def plot_sweep(sweepfile, swap_axes=False, do=('types', 'balanced1')):
 
     ## Plot the type of half adder e.g. (0, 2, 1, 3)
     if 'types' in do:
-        fig = plt.figure(figsize=(7.0, 5.0))
+        fig = plt.figure(figsize=figsize)
         ax = fig.add_subplot(111)
 
         plot_grid = np.transpose(halfadder_type_grid)
         cMapDiscr = ListedColormap(['white', '#5555ff', 'red', 'orange', 'darkgreen'][0:n_types+1])
         im = ax.imshow(plot_grid, vmin=0, vmax=n_types+1, origin='lower', interpolation='nearest', cmap=cMapDiscr, extent=extent) #, vmin=0, vmax=1
-        cbar = fig.colorbar(im)
+        cbar = fig.colorbar(im, aspect=12, pad=0.08)
         # cbar.set_label('Is half adder?', rotation=270, labelpad=25)
         cbar.ax.get_yaxis().set_ticks([0.5+i for i in range(n_types+1)])
         cbar.ax.get_yaxis().set_ticklabels(['No half adder'] + ['In %d %s' % (tup[0], tup[2:]) for tup in halfadder_types])
@@ -238,8 +235,8 @@ def plot_sweep(sweepfile, swap_axes=False, do=('types', 'balanced1')):
         plt.show()
     
     ## Plot the balancedness
-    if f'balanced1' in do:
-        fig = plt.figure(figsize=(7.0, 5.0))
+    if 'balanced1' in do:
+        fig = plt.figure(figsize=figsize)
         ax = fig.add_subplot(111)
 
         plot_grid = np.transpose(balance1_grid) # eval is bad practice but idc
@@ -268,8 +265,8 @@ def plot_sweep(sweepfile, swap_axes=False, do=('types', 'balanced1')):
         plt.savefig(os.path.join(outDir, os.path.split(sweepfile)[1].replace('.txt', f'_balanced1.pdf')))
         plt.show()
     
-    if f'balanced2' in do:
-        fig = plt.figure(figsize=(7.0, 5.0))
+    if 'balanced2' in do:
+        fig = plt.figure(figsize=figsize)
         ax = fig.add_subplot(111)
 
         plot_grid = np.transpose(balance2_grid) # eval is bad practice but idc
@@ -301,12 +298,13 @@ def plot_sweep(sweepfile, swap_axes=False, do=('types', 'balanced1')):
 
 
 if __name__ == "__main__":
-    plot_sweep('Results/Sweeps/Sweep_000006/table(d100-210_10,s-100-100_10).txt', swap_axes=True, do=('types'))
-    plot_sweep('Results/Sweeps/Sweep_000006/table(d100-210_10,s-100-100_10).txt', swap_axes=True, do=('balanced1'))
-    plot_sweep('Results/Sweeps/Sweep_000006/table(d100-210_10,s-100-100_10).txt', swap_axes=True, do=('balanced2'))
+    pass
+    # plot_sweep('Results/Sweeps/Sweep_000006/table(d100-210_10,s-100-100_10).txt', swap_axes=True, do=('types'))
+    # plot_sweep('Results/Sweeps/Sweep_000006/table(d100-210_10,s-100-100_10).txt', swap_axes=True, do=('balanced1'))
+    # plot_sweep('Results/Sweeps/Sweep_000006/table(d100-210_10,s-100-100_10).txt', swap_axes=True, do=('balanced2'))
 
     # plot_sweep('Results/Sweeps/Sweep_000006/table(d100-200_10,Msat3e5-15e5_1e5).txt', swap_axes=True, do=('types'))
     # plot_sweep('Results/Sweeps/Sweep_000006/table(d100-200_10,Msat3e5-15e5_1e5).txt', swap_axes=True, do=('balanced1'))
     # plot_sweep('Results/Sweeps/Sweep_000006/table(d100-200_10,Msat3e5-15e5_1e5).txt', swap_axes=True, do=('balanced2'))
 
-    # plot_sweep('Results/Sweeps/Sweep_000006/table(d100-210_2,s20).txt')
+    # plot_sweep('Results/Sweeps/Sweep_000006/table(d100-210_2,s20).txt', figsize=(7.0, 3.0), do=('types'))
