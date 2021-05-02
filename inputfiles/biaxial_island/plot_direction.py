@@ -23,7 +23,7 @@ def read_mumax3_table(filename):
     
     return table
 
-def plot(filename, save=True, inset=None, groupBy=None):
+def plot(filename, save=False, inset=None, groupBy=None):
     '''
         @param filename [str]: relative path of the mumax table
         @param save [bool] <False>: Whether or not to save the created plot.
