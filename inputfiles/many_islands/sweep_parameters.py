@@ -12,7 +12,8 @@ import pandas as pd
 import shutil
 from math import pi
 from matplotlib import cm
-from matplotlib.colors import ListedColormap
+from matplotlib.colors import ListedColormap, LinearSegmentedColormap
+from matplotlib.patches import Rectangle
 font = {'size':16}
 matplotlib.rc('font', **font)
 
@@ -101,7 +102,7 @@ def replace_with_dict(ar, dic):
     sidx = k.argsort()
     return v[sidx[np.searchsorted(k,ar,sorter=sidx)]]
 
-def plot_sweep(sweepfile, swap_axes=False, do=('types', 'balanced1', 'balanced2'), figsize=(8.0, 5.0)):
+def plot_sweep(sweepfile, swap_axes=False, do=('types', 'balanced1', 'balanced2'), figsize=(10.0, 5.0)):
     """
         @param sweepfile [str]: The relative path to the "table(var1,var2).txt".
         @param swap_axes [bool] (False): If True, var1 is plotted on the y-axis and var2 on the x-axis.
@@ -137,6 +138,8 @@ def plot_sweep(sweepfile, swap_axes=False, do=('types', 'balanced1', 'balanced2'
     var1_sweeped, var2_sweeped = len(var1_range) > 1, len(var2_range) > 1
     var1_step = var1_range[1] - var1_range[0] if var1_sweeped else var2_range[1] - var2_range[0]
     var2_step = var2_range[1] - var2_range[0] if var2_sweeped else var1_range[1] - var1_range[0]
+    var1_range2 = [var1_range[0] - var1_step/2] + [i + var1_step/2 for i in var1_range] # Secondary grid, for drawing rectangles
+    var2_range2 = [var2_range[0] - var2_step/2] + [i + var2_step/2 for i in var2_range] # Secondary grid, for drawing rectangles
 
     is_halfadder_grid = np.zeros((len(var1_range), len(var2_range))) # List of lists, main list enumerates var1, sublists contain var2 enumeration
     halfadder_types = []
@@ -198,13 +201,22 @@ def plot_sweep(sweepfile, swap_axes=False, do=('types', 'balanced1', 'balanced2'
             ax.plot(line[1], line[0], **kwargs)
     
 
+    colormaps = [cm.get_cmap('Blues'), 
+                cm.get_cmap('Reds'), 
+                LinearSegmentedColormap('testCmap', segmentdata={'red': [[0, 1, 1], [1, 0.9, 0.9]], 'green': [[0, 1, 1], [1, 0.9, 0.9]], 'blue': [[0, 1, 1], [1, 0, 0]]}),
+                cm.get_cmap('Greens')
+                ]
+    darkestcolorfrac = 0.8
+    # cMapDiscr = ListedColormap(['white', '#5555ff', 'red', 'orange', 'darkgreen'][0:n_types+1])
+    cMapDiscr = ListedColormap((['white'] + [c(darkestcolorfrac) for c in colormaps])[0:n_types+1])
+
     ## Plot the type of half adder e.g. (0, 2, 1, 3)
     if 'types' in do:
         fig = plt.figure(figsize=figsize)
         ax = fig.add_subplot(111)
 
         plot_grid = np.transpose(halfadder_type_grid)
-        cMapDiscr = ListedColormap(['white', '#5555ff', 'red', 'orange', 'darkgreen'][0:n_types+1])
+        
         im = ax.imshow(plot_grid, vmin=0, vmax=n_types+1, origin='lower', interpolation='nearest', cmap=cMapDiscr, extent=extent) #, vmin=0, vmax=1
         cbar = fig.colorbar(im, aspect=12, pad=0.08)
         # cbar.set_label('Is half adder?', rotation=270, labelpad=25)
@@ -233,43 +245,103 @@ def plot_sweep(sweepfile, swap_axes=False, do=('types', 'balanced1', 'balanced2'
         plt.gcf().tight_layout()
         plt.savefig(os.path.join(outDir, os.path.split(sweepfile)[1].replace('.txt', '_types.pdf')))
         plt.show()
-    
-    ## Plot the balancedness
+
     if 'balanced1' in do:
         fig = plt.figure(figsize=figsize)
         ax = fig.add_subplot(111)
 
-        plot_grid = np.transpose(balance1_grid) # eval is bad practice but idc
-        im = ax.imshow(plot_grid, vmax=max(0, np.max(plot_grid)), origin='lower', interpolation='nearest', cmap=cm.get_cmap('inferno'), extent=extent)
-        cbar = fig.colorbar(im)
-        cbar.set_label(f'Balanced? (rule 1)', rotation=270, labelpad=25)
+        plot_grid = np.transpose(halfadder_type_grid)
+        
+        im = ax.imshow(plot_grid, vmin=0, vmax=n_types+1, origin='lower', interpolation='nearest', cmap=cMapDiscr, extent=extent) #, vmin=0, vmax=1
+        im.set_visible(False) # Only need the colorbar
+        cbar = fig.colorbar(im, aspect=12, pad=0.1)
+        cbar.ax.get_yaxis().set_ticks([0.5+i for i in range(n_types+1)])
+        cbar.ax.get_yaxis().set_ticklabels(['No half adder'] + ['In %d %s' % (tup[0], tup[2:]) for tup in halfadder_types])
+        
+        print(np.max(balance1_grid))
 
+        # Imshow the balance1_grid in greyscale, to allow hover and to allow grayscale colorbar
+        # TODO: maybe make the maximum of the greyscale colorbar also the maximum of balance1_grid
+        im_grey = ax.imshow(np.transpose(balance1_grid), vmax=max(0, np.max(balance1_grid)), origin='lower', interpolation='nearest', cmap=cm.get_cmap('Greys'), extent=extent)
+        cbar_grey = fig.colorbar(im_grey, aspect=24, pad=0.02, orientation="vertical")
+        cbar_grey.set_label(r'min$_\alpha$($E_{\alpha, 1}$) - max$_\alpha$($E_{\alpha, 0}$) [eV]', rotation=270, labelpad=25)
+        
+
+        balance1_range = [np.min(balance1_grid[~np.isnan(balance1_grid)]), max(0, np.max(balance1_grid[~np.isnan(balance1_grid)]))]
+        # balance1_range = [np.min(balance1_grid[~np.isnan(balance1_grid)]), np.max(balance1_grid[~np.isnan(balance1_grid)])]
+        for i, var1 in enumerate(var1_range):
+            for j, var2 in enumerate(var2_range):
+                halfadder_type = halfadder_type_grid[i][j]
+                balance1 = balance1_grid[i][j]
+                balance1_portion = (balance1 - balance1_range[0])/(balance1_range[1]-balance1_range[0])
+                if halfadder_type == 0:
+                    col = 'white'
+                else:
+                    col = colormaps[halfadder_type-1](balance1_portion*darkestcolorfrac)
+
+                rect = Rectangle((min(var1_range2[i:i+2]), min(var2_range2[j:j+2])), abs(var1_step), abs(var2_step), edgecolor='none', facecolor=col)
+                ax.add_patch(rect)
+        
+        draw_contour(ax, color='black', alpha=1)
+        ax.set_xlim([extent[0], extent[1]])
+        ax.set_ylim([extent[2], extent[3]])
+        
         ax.tick_params(axis='both', which='major', length=8)
         if var1_sweeped and var2_sweeped: # Stretch figure to fit pdf nicely if both vars sweeped, but keep square pixels otherwise.
             ax.set_aspect('auto')
         if var1_sweeped:
-            plt.xlabel(var1_name + ' [%s]' % var1_unit)
+            ax.set_xlabel(var1_name + ' [%s]' % var1_unit)
             ax.set_xticks(var1_range, minor=True)
         else:
             plt.xticks([])
         if var2_sweeped:
-            plt.ylabel(var2_name + ' [%s]' % var2_unit)
+            ax.set_ylabel(var2_name + ' [%s]' % var2_unit)
             ax.set_yticks(var2_range, minor=True)
         else:
             plt.yticks([])
-        
-        draw_contour(ax, color='black', alpha=1)
 
         plt.gcf().subplots_adjust(bottom=0.15, left=0.15, right=0.95)
         plt.gcf().tight_layout()
-        plt.savefig(os.path.join(outDir, os.path.split(sweepfile)[1].replace('.txt', f'_balanced1.pdf')))
+        # plt.savefig(os.path.join(outDir, os.path.split(sweepfile)[1].replace('.txt', f'_balanced1.pdf')))
         plt.show()
+
+
+    # ## Plot the balancedness
+    # if 'balanced1' in do:
+    #     fig = plt.figure(figsize=figsize)
+    #     ax = fig.add_subplot(111)
+
+    #     plot_grid = np.transpose(balance1_grid)
+    #     im = ax.imshow(plot_grid, vmax=max(0, np.max(plot_grid)), origin='lower', interpolation='nearest', cmap=cm.get_cmap('inferno'), extent=extent)
+    #     cbar = fig.colorbar(im)
+    #     cbar.set_label(f'Balanced? (rule 1)', rotation=270, labelpad=25)
+
+    #     ax.tick_params(axis='both', which='major', length=8)
+    #     if var1_sweeped and var2_sweeped: # Stretch figure to fit pdf nicely if both vars sweeped, but keep square pixels otherwise.
+    #         ax.set_aspect('auto')
+    #     if var1_sweeped:
+    #         plt.xlabel(var1_name + ' [%s]' % var1_unit)
+    #         ax.set_xticks(var1_range, minor=True)
+    #     else:
+    #         plt.xticks([])
+    #     if var2_sweeped:
+    #         plt.ylabel(var2_name + ' [%s]' % var2_unit)
+    #         ax.set_yticks(var2_range, minor=True)
+    #     else:
+    #         plt.yticks([])
+        
+    #     draw_contour(ax, color='black', alpha=1)
+
+    #     plt.gcf().subplots_adjust(bottom=0.15, left=0.15, right=0.95)
+    #     plt.gcf().tight_layout()
+    #     plt.savefig(os.path.join(outDir, os.path.split(sweepfile)[1].replace('.txt', f'_balanced1.pdf')))
+    #     plt.show()
     
     if 'balanced2' in do:
         fig = plt.figure(figsize=figsize)
         ax = fig.add_subplot(111)
 
-        plot_grid = np.transpose(balance2_grid) # eval is bad practice but idc
+        plot_grid = np.transpose(balance2_grid)
         im = ax.imshow(plot_grid, vmin=0, origin='lower', interpolation='nearest', cmap=cm.get_cmap('inferno'), extent=extent)
         cbar = fig.colorbar(im)
         cbar.set_label(f'Balanced? (rule 2)', rotation=270, labelpad=25)
@@ -300,7 +372,7 @@ def plot_sweep(sweepfile, swap_axes=False, do=('types', 'balanced1', 'balanced2'
 if __name__ == "__main__":
     pass
     # plot_sweep('Results/Sweeps/Sweep_000006/table(d100-210_10,s-100-100_10).txt', swap_axes=True, do=('types'))
-    # plot_sweep('Results/Sweeps/Sweep_000006/table(d100-210_10,s-100-100_10).txt', swap_axes=True, do=('balanced1'))
+    plot_sweep('Results/Sweeps/Sweep_000006/table(d100-210_10,s-100-100_10).txt', swap_axes=True, do=('balanced1'))
     # plot_sweep('Results/Sweeps/Sweep_000006/table(d100-210_10,s-100-100_10).txt', swap_axes=True, do=('balanced2'))
 
     # plot_sweep('Results/Sweeps/Sweep_000006/table(d100-200_10,Msat3e5-15e5_1e5).txt', swap_axes=True, do=('types'))
