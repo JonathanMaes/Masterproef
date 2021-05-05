@@ -24,21 +24,22 @@ def read_mumax3_table(filename):
 if __name__ == "__main__":
     # inFileName = 'two_islands_interaction.out/tableInt_a0Pi,0Pi_d128_r0.66,0.66_cell4nm.txt'
     # inFileName = 'two_islands_interaction.out/tableInt_a0Pi,0Pi_d128_r0.49,0.49_cell4nm.txt'
+    inFileName = 'two_islands_interaction.out/tableInt_a0Pi,0Pi_d128_r0.49,0.49_cell1nm.txt'
     # inFileName = 'two_islands_interaction.out/tableInt_a0Pi,0Pi_d128_r0.81,0.81_cell4nm.txt'
     # inFileName = 'two_islands_interaction.out/tableInt_a0Pi,0Pi_d128_r0.66,0.66_cell1nm.txt'
     # inFileName = 'two_islands_interaction.out/tableInt_a0Pi,Pi4_d128_r0.66,0.66_cell1nm.txt'
-    inFileName = 'two_islands_interaction.out/tableInt_aPi4,Pi4_d128_r0.66,0.66_cell1nm.txt'
+    # inFileName = 'two_islands_interaction.out/tableInt_aPi4,Pi4_d128_r0.66,0.66_cell1nm.txt'
     # inFileName = 'two_islands_interaction_extField.out/table_Ext0.5-3Pi4_a0Pi,Pi4_d128_r0.66,0.66_cell1nm.txt'
+    # inFileName = 'two_islands_interaction_extField.out/table_Ext0.01-3Pi4_a0Pi,Pi4_d128_r0.66,0.66_cell1nm.txt'
     # inFileName = 'two_islands_interaction_extField.out/table.txt'
     # inFileName = 'two_islands_interaction_noCustomField.out/table.txt'
     table = read_mumax3_table(inFileName)
 
     fig = plt.figure(figsize=(7.0, 5.0))
-    legend = []
     USE_ELECTRONVOLT = True
     USE_ABSOLUTE_VALUE = False
     WRAP_EDGES = not (table['island2_magAngle'].sub(6.2831855).abs().min() < 1e-5)
-    INTERPOLATE_PIXELS = True
+    INTERPOLATE_PIXELS = 1
     Energy = []
     if WRAP_EDGES:
         lim_1 = [0, 360]
@@ -85,7 +86,7 @@ if __name__ == "__main__":
     if not os.path.exists(outDir):
         os.makedirs(outDir)
     outFileName = os.path.join(outDir, os.path.splitext(os.path.basename(inFileName).split('table')[-1])[0]) + '.pdf'
-    # plt.savefig(outFileName)
+    plt.savefig(outFileName)
 
     #### Show plot
     plt.show()
