@@ -55,7 +55,7 @@ def plot(inFileName, show=True, save=False, outName=''):
         highest_energy = max(max(E_barrier), highest_energy)
 
         if GROUP_BY == "size":
-            label = '%s nm' % int(size*1e9)
+            label = '$L$ = %s nm' % int(size*1e9)
         elif GROUP_BY == "Cell_size":
             label = '%s nm' % (size*1e9)
             
