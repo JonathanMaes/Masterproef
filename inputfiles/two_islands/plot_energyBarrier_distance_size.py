@@ -21,12 +21,13 @@ def read_mumax3_table(filename):
     
     return table
 
+
 def plot(inFileName, show=True, save=False, outName=''):
     table = read_mumax3_table(inFileName)
 
     USE_ELECTRONVOLT = True
     USE_ABSOLUTE_VALUE = False
-    GROUP_BY = "Cell_size"
+    GROUP_BY = "size"
     highest_energy = 0
     fig = plt.figure(figsize=(8.0, 5.0))
     ax = fig.add_subplot(111)
@@ -53,8 +54,8 @@ def plot(inFileName, show=True, save=False, outName=''):
         distancesNormalized = np.array(distancesNormalized)
         highest_energy = max(max(E_barrier), highest_energy)
 
-        if GROUP_BY == "Size":
-            label = '%s nm' % size
+        if GROUP_BY == "size":
+            label = '%s nm' % int(size*1e9)
         elif GROUP_BY == "Cell_size":
             label = '%s nm' % (size*1e9)
             
@@ -86,10 +87,7 @@ def plot(inFileName, show=True, save=False, outName=''):
         plt.show()
 
 
-
-    
-
 if __name__ == "__main__":
-    plot('two_islands_energyBarrier_distance.out/tableBarrierDistance_s50,100_r0.49_dist1-4L_2,4nm.txt', save=False, outName='dist1-4L_r0.49_s100&50_4nm&2nm')
+    plot('two_islands_energyBarrier_distance.out/tableBarrierDistance_s50,100_r0.49_dist1-4L_2,4nm.txt', save=True, outName='dist1-4L_r0.49_s100&50_4nm&2nm')
 
     # plot('two_islands_energyBarrier_distance.out/tableBarrierDistance_s100_r0.81_dist100-300_4nm.txt')
