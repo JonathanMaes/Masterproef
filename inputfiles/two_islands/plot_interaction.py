@@ -22,16 +22,13 @@ def read_mumax3_table(filename):
     return table
 
 if __name__ == "__main__":
-    # inFileName = 'two_islands_interaction.out/tableInt_a0Pi,0Pi_d128_r0.66,0.66_cell4nm.txt'
+    inFileName = 'two_islands_interaction.out/tableInt_a0Pi,0Pi_d128_r0.66,0.66_cell4nm.txt'
     # inFileName = 'two_islands_interaction.out/tableInt_a0Pi,0Pi_d128_r0.49,0.49_cell4nm.txt'
-    inFileName = 'two_islands_interaction.out/tableInt_a0Pi,0Pi_d128_r0.49,0.49_cell1nm.txt'
     # inFileName = 'two_islands_interaction.out/tableInt_a0Pi,0Pi_d128_r0.81,0.81_cell4nm.txt'
+    # inFileName = 'two_islands_interaction.out/tableInt_a0Pi,0Pi_d128_r0.482,0.482_cell1nm.txt'
     # inFileName = 'two_islands_interaction.out/tableInt_a0Pi,0Pi_d128_r0.66,0.66_cell1nm.txt'
     # inFileName = 'two_islands_interaction.out/tableInt_a0Pi,Pi4_d128_r0.66,0.66_cell1nm.txt'
     # inFileName = 'two_islands_interaction.out/tableInt_aPi4,Pi4_d128_r0.66,0.66_cell1nm.txt'
-    # inFileName = 'two_islands_interaction_extField.out/table_Ext0.5-3Pi4_a0Pi,Pi4_d128_r0.66,0.66_cell1nm.txt'
-    # inFileName = 'two_islands_interaction_extField.out/table_Ext0.01-3Pi4_a0Pi,Pi4_d128_r0.66,0.66_cell1nm.txt'
-    # inFileName = 'two_islands_interaction_extField.out/table.txt'
     # inFileName = 'two_islands_interaction_noCustomField.out/table.txt'
     table = read_mumax3_table(inFileName)
 
