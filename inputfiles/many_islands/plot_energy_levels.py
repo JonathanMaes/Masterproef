@@ -97,7 +97,7 @@ def plot_energy_levels(halfadderfile):
             text = '%d°'% current_magangles_clean[j]
             if j == 0:
                 lowestenergy_comb = halfadder_comb[int(current_magangles_clean[j]/90)]
-                text += '=%d' % lowestenergy_comb
+                # text += '=%d' % lowestenergy_comb
                 resulting_comb.append(lowestenergy_comb)
             textpos_x = i+0.5
             if minenergydiff < energyheight*PLOTVAR_minallowedenergydiff_fraction: # If energy levels too close, then put the text off-center
@@ -109,10 +109,12 @@ def plot_energy_levels(halfadderfile):
     ax.tick_params(axis='both', which='major', length=8)
     plt.xticks([i+0.5 for i in range(4)], [('In %d°\n%d' + r' $\rightarrow$ %d') % (i*90, halfadder_comb[i], resulting_comb[i]) for i in range(4)])
     ax.set_ylabel('Energy [eV]')
+    ax.spines['right'].set_color('none')
+    ax.spines['top'].set_color('none')
 
     # plt.gcf().subplots_adjust(bottom=0.15, left=0.15, right=0.95)
     plt.gcf().tight_layout()
-    # plt.savefig(os.path.join(outDir, os.path.split(halfadderfile)[1].replace('.txt', '_energylevels.pdf')))
+    plt.savefig(os.path.join(outDir, os.path.split(halfadderfile)[1].replace('.txt', '_energylevels.pdf')))
     plt.show()
 
 
