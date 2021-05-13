@@ -103,8 +103,6 @@ def plot_energy_levels(halfadderfile):
             if minenergydiff < energyheight*PLOTVAR_minallowedenergydiff_fraction: # If energy levels too close, then put the text off-center
                 textpos_x = i+.2+0.2*j
             ax.text(textpos_x, energylevel, text, fontsize=10, transform=ax.transData, ha='center', va='center', bbox=PLOTVAR_bboxprops)
-    # for line in contourlines:
-    #     ax.plot(line[1], line[0], **kwargs)
 
     ax.tick_params(axis='both', which='major', length=8)
     plt.xticks([i+0.5 for i in range(4)], [('In %d°\n%d' + r' $\rightarrow$ %d') % (i*90, halfadder_comb[i], resulting_comb[i]) for i in range(4)])
@@ -122,4 +120,5 @@ def plot_energy_levels(halfadderfile):
 
 if __name__ == "__main__":
     pass
-    plot_energy_levels('Results/Halfadder000006/table(d170,s-60).txt')
+    # plot_energy_levels('Results/Halfadder000006/table(d170,s-60).txt')
+    plot_energy_levels('Results/Halfadder000006/tableside(d50,s130).txt')

@@ -102,9 +102,10 @@ def replace_with_dict(ar, dic):
     sidx = k.argsort()
     return v[sidx[np.searchsorted(k,ar,sorter=sidx)]]
 
-def plot_sweep(sweepfile, swap_axes=False, do=('balanced1', 'balanced2'), figsize=(10.0, 5.0), show_colorbars=True, reverse_halfadder_foreground=False, useLR=False):
+def plot_sweep(sweepfile, save=True, swap_axes=False, do=('balanced1', 'balanced2'), figsize=(10.0, 5.0), show_colorbars=True, reverse_halfadder_foreground=False, useLR=False):
     """
         @param sweepfile [str]: The relative path to the "table(var1,var2).txt".
+        @param save [bool] (True): If True, the figures are saved in pdf format.
         @param swap_axes [bool] (False): If True, var1 is plotted on the y-axis and var2 on the x-axis.
                                          If False, var1 on the x-axis and var2 on the y-axis, as normal.
         @param do [tuple] ('types', 'balanced1', 'balanced2'): All the actions in this tuple are plotted and shown. These actions are:
@@ -279,10 +280,11 @@ def plot_sweep(sweepfile, swap_axes=False, do=('balanced1', 'balanced2'), figsiz
 
         plt.gcf().subplots_adjust(bottom=0.15, left=0.15, right=0.95)
         plt.gcf().tight_layout()
-        outFilename = os.path.join(outDir, os.path.split(sweepfile)[1].replace('.txt', '_balanced1.pdf'))
-        if reverse_halfadder_foreground:
-            outFilename = outFilename.replace('.pdf', '_reversedForeground.pdf')
-        plt.savefig(outFilename)
+        if save:
+            outFilename = os.path.join(outDir, os.path.split(sweepfile)[1].replace('.txt', '_balanced1.pdf'))
+            if reverse_halfadder_foreground:
+                outFilename = outFilename.replace('.pdf', '_reversedForeground.pdf')
+            plt.savefig(outFilename)
         plt.show()
 
 
@@ -345,10 +347,11 @@ def plot_sweep(sweepfile, swap_axes=False, do=('balanced1', 'balanced2'), figsiz
 
         plt.gcf().subplots_adjust(bottom=0.15, left=0.15, right=0.95)
         plt.gcf().tight_layout()
-        outFilename = os.path.join(outDir, os.path.split(sweepfile)[1].replace('.txt', '_balanced2.pdf'))
-        if reverse_halfadder_foreground:
-            outFilename = outFilename.replace('.pdf', '_reversedForeground.pdf')
-        plt.savefig(outFilename)
+        if save:
+            outFilename = os.path.join(outDir, os.path.split(sweepfile)[1].replace('.txt', '_balanced2.pdf'))
+            if reverse_halfadder_foreground:
+                outFilename = outFilename.replace('.pdf', '_reversedForeground.pdf')
+            plt.savefig(outFilename)
         plt.show()
 
 
@@ -361,6 +364,6 @@ if __name__ == "__main__":
 
     # plot_sweep('Results/Sweeps/Sweep_000006/table(d100-200_10,Msat3e5-15e5_1e5).txt', swap_axes=True, do=('balanced1'), useLR=True)
     # plot_sweep('Results/Sweeps/Sweep_000006/table(d100-200_10,Msat3e5-15e5_1e5).txt', swap_axes=True, do=('balanced2'), useLR=True)
-    plot_sweep('Results/Sweeps/Sweep_000006/extremelyimportantsweep(d0-100_5,s100-180_5).txt', swap_axes=True, useLR=True)
+    plot_sweep('Results/Sweeps/Sweep_000006/tableside(d0-100_5,s100-180_5).txt', swap_axes=True, useLR=True)
 
     # plot_sweep('Results/Sweeps/Sweep_000006/table(d100-210_2,s20).txt', figsize=(7.0, 3.0), do=('types'))
