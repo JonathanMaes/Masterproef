@@ -102,7 +102,7 @@ def replace_with_dict(ar, dic):
     sidx = k.argsort()
     return v[sidx[np.searchsorted(k,ar,sorter=sidx)]]
 
-def plot_sweep(sweepfile, save=True, swap_axes=False, do=('balanced1', 'balanced2'), figsize=(10.0, 5.0), show_colorbars=True, reverse_halfadder_foreground=False, useLR=False):
+def plot_sweep(sweepfile, save=True, swap_axes=False, do=('balanced1', 'balanced2'), figsize=(10.0, 5.0), labelpads=None, show_colorbars=True, reverse_halfadder_foreground=False, useLR=False):
     """
         @param sweepfile [str]: The relative path to the "table(var1,var2).txt".
         @param save [bool] (True): If True, the figures are saved in pdf format.
@@ -112,6 +112,7 @@ def plot_sweep(sweepfile, save=True, swap_axes=False, do=('balanced1', 'balanced
             - 'balanced1': Imshow where min_a(E_{a,1}) - max_a(E_{a,0}) is plotted (diff highest ground state with lowest first excited state).
             - 'balanced2': Imshow where max_a(E_{a,0}) - min_a(E_{a,0}) is plotted (diff highest ground state with lowest ground state).
         @param figsize [tuple(2)] (7.0, 5.0): The dimensions of the saved figures, in inches. 
+        @param labelpads [tuple(2)] (-25, -25): Label padding of greyscale colorbars.
         @param show_halfadder_types [bool] (True): If False, 4 inch is subtracted from the figsize width.
         @param reverse_halfadder_foreground [bool] (False): If True, the last halfadder returned by check_if_halfadder() is plotted. If False, the first one.
         @param useLR [bool] (False): If True, island 1 is given the name 'L', and island 2 the name 'R'.
@@ -203,8 +204,8 @@ def plot_sweep(sweepfile, save=True, swap_axes=False, do=('balanced1', 'balanced
     extent = [lim_x[0], lim_x[1], lim_y[0], lim_y[1]]
     contourlines = contour_rect(halfadder_type_grid.transpose(), extent)
     print('Half adder types in order (input, output, %d deg, %d deg, %d deg, %d deg): %s' % (*angles_i, halfadder_types))
-    def draw_contour(ax, **kwargs):
-        for line in contourlines:
+    def draw_contour(ax, contour_lines, **kwargs):
+        for line in contour_lines:
             ax.plot(line[1], line[0], **kwargs)
     
 
@@ -242,7 +243,8 @@ def plot_sweep(sweepfile, save=True, swap_axes=False, do=('balanced1', 'balanced
         im_grey = ax.imshow(np.transpose(balance1_grid), vmin=balance1_range[0], vmax=balance1_range[1], origin='lower', interpolation='nearest', cmap=cm.get_cmap('Greys'), extent=extent)
         if show_colorbars:
             cbar_grey = fig.colorbar(im_grey, aspect=24, pad=0.02)
-            cbar_grey.set_label(r'min$_\alpha$($E_{\alpha, 1}$) - max$_\alpha$($E_{\alpha, 0}$) [eV]', rotation=270, labelpad=-25)
+            labelpad = labelpads[0] if labelpads else -25
+            cbar_grey.set_label(r'$B_1$ [eV]', rotation=270, labelpad=labelpad)
             # cbar_grey.ax.get_yaxis().set_ticks(list(cbar_grey.get_ticks()) + balance1_range)
             cbar_grey.ax.get_yaxis().set_ticks(balance1_range)
             cbar_grey.ax.minorticks_on()
@@ -255,14 +257,18 @@ def plot_sweep(sweepfile, save=True, swap_axes=False, do=('balanced1', 'balanced
                 if halfadder_type == 0:
                     col = 'white'
                 else:
-                    col = colormaps[halfadder_type-1](balance1_portion*darkestcolorfrac+(1-darkestcolorfrac)/2)
+                    col = colormaps[halfadder_type-1]((balance1_portion*darkestcolorfrac+(1-darkestcolorfrac)/2)**1.5)
 
                 rect = Rectangle((min(var1_range2[i:i+2]), min(var2_range2[j:j+2])), abs(var1_step), abs(var2_step), edgecolor='none', facecolor=col)
                 ax.add_patch(rect)
-        
-        draw_contour(ax, color='black', alpha=1)
+
+        draw_contour(ax, contourlines, color='black', alpha=1)
         ax.set_xlim([extent[0], extent[1]])
         ax.set_ylim([extent[2], extent[3]])
+
+        # Grey line around the region where there is a positive balance
+        contourlines_balance1 = contour_rect(balance1_grid.transpose() > 0, extent)
+        draw_contour(ax, contourlines_balance1, color='navy', alpha=1)
         
         ax.tick_params(axis='both', which='major', length=8)
         if var1_sweeped and var2_sweeped: # Stretch figure to fit pdf nicely if both vars sweeped, but keep square pixels otherwise.
@@ -309,7 +315,8 @@ def plot_sweep(sweepfile, save=True, swap_axes=False, do=('balanced1', 'balanced
         im_grey = ax.imshow(np.transpose(balance2_grid), vmin=balance2_range[0], vmax=balance2_range[1], origin='lower', interpolation='nearest', cmap=cm.get_cmap('Greys').reversed(), extent=extent)
         if show_colorbars:
             cbar_grey = fig.colorbar(im_grey, aspect=24, pad=0.02)
-            cbar_grey.set_label(r'max$_\alpha$($E_{\alpha, 0}$) - min$_\alpha$($E_{\alpha, 0}$) [eV]', rotation=270, labelpad=-25)
+            labelpad = labelpads[1] if labelpads else -25
+            cbar_grey.set_label(r'$B_2$ [eV]', rotation=270, labelpad=labelpad)
             # cbar_grey.ax.get_yaxis().set_ticks(list(cbar_grey.get_ticks()) + balance2_range)
             cbar_grey.ax.get_yaxis().set_ticks(balance2_range)
             cbar_grey.ax.minorticks_on()
@@ -327,7 +334,7 @@ def plot_sweep(sweepfile, save=True, swap_axes=False, do=('balanced1', 'balanced
                 rect = Rectangle((min(var1_range2[i:i+2]), min(var2_range2[j:j+2])), abs(var1_step), abs(var2_step), edgecolor='none', facecolor=col)
                 ax.add_patch(rect)
         
-        draw_contour(ax, color='black', alpha=1)
+        draw_contour(ax, contourlines, color='black', alpha=1)
         ax.set_xlim([extent[0], extent[1]])
         ax.set_ylim([extent[2], extent[3]])
         
@@ -357,13 +364,13 @@ def plot_sweep(sweepfile, save=True, swap_axes=False, do=('balanced1', 'balanced
 
 if __name__ == "__main__":
     pass
-    # plot_sweep('Results/Sweeps/Sweep_000006/table(d100-210_10,s-100-100_10).txt', swap_axes=True, do=('balanced1'), useLR=True)
+    # plot_sweep('Results/Sweeps/Sweep_000006/table(d100-210_10,s-100-100_10).txt', swap_axes=True, do=('balanced1'), labelpads=[-35], useLR=True)
     # plot_sweep('Results/Sweeps/Sweep_000006/table(d100-210_10,s-100-100_10).txt', swap_axes=True, do=('balanced1'), reverse_halfadder_foreground=True, show_colorbars=False)
     # plot_sweep('Results/Sweeps/Sweep_000006/table(d100-210_10,s-100-100_10).txt', swap_axes=True, do=('balanced2'), useLR=True)
     # plot_sweep('Results/Sweeps/Sweep_000006/table(d100-210_10,s-100-100_10).txt', swap_axes=True, do=('balanced2'), reverse_halfadder_foreground=True, show_colorbars=False)
 
-    # plot_sweep('Results/Sweeps/Sweep_000006/table(d100-200_10,Msat3e5-15e5_1e5).txt', swap_axes=True, do=('balanced1'), useLR=True)
+    # plot_sweep('Results/Sweeps/Sweep_000006/table(d100-200_10,Msat3e5-15e5_1e5).txt', swap_axes=True, do=('balanced1'), labelpads=[-35], useLR=True)
     # plot_sweep('Results/Sweeps/Sweep_000006/table(d100-200_10,Msat3e5-15e5_1e5).txt', swap_axes=True, do=('balanced2'), useLR=True)
-    plot_sweep('Results/Sweeps/Sweep_000006/tableside(d0-100_5,s100-180_5).txt', swap_axes=True, useLR=True)
+    plot_sweep('Results/Sweeps/Sweep_000006/tableside(d0-100_5,s100-180_5).txt', swap_axes=True, useLR=True, labelpads=[-45, -32])
 
     # plot_sweep('Results/Sweeps/Sweep_000006/table(d100-210_2,s20).txt', figsize=(7.0, 3.0), do=('types'))
