@@ -7,9 +7,9 @@
 //  we kindly ask you to cite the references in references.bib        //
 //********************************************************************//
 //output directory: c:\Jonathan\UGent\Masterproef\inputfiles\biaxial_island\biaxial_island_shape.out/
-Nxy := 64
+Nxy := 128
 Nz := 1
-cellSize := 2e-9
+cellSize := 1e-9
 thickness := 5e-9
 SetGridSize(Nxy, Nxy, Nz)
 SetCellSize(cellSize, cellSize, thickness/Nz)
@@ -20,7 +20,7 @@ print("Exchange length:", Sqrt((2*Aex.GetRegion(0))/(mu0*Pow(Msat.GetRegion(0), 
 TableAdd(E_total)
 TableAdd(E_zeeman)
 angle := 0.0
-roundness := 1.0
+roundness := 0.66
 size := 100
 volume := 0.0
 TableAddVar(angle, "Angle", "rad")
@@ -31,15 +31,16 @@ TableAddVar(volume, "Volume", "m^3")
 angle0 := angle
 roundness0 := roundness
 size0 := size
-for size = size0; size >= 100; size = size * 0.5 {
-	for roundness = roundness0; (roundness >= 0.1) && (roundness*size > 128/Nxy); roundness -= 0.01 {
+for size = size0; size >= size0; size = size * 0.5 {
+	for roundness = roundness0; roundness >= 0.5; roundness -= 100 {
 		print(sprintf("Short axis: %.3f nm", roundness*size))
 		print(sprintf("Long axis: %d nm", size))
-		geometry := Ellipse(size*1e-9, size*roundness*1e-9)
+		geometry := Ellipse(size*1e-9, size*roundness*1e-9).RotZ(Pi / 4)
 		geometry = geometry.Add(geometry.RotZ(Pi / 2))
 		SetGeom(geometry)
 		volume = geom.average() * Pow(cellSize*Nxy, 2) * thickness
 		print(sprintf("Volume: %.3e m³", volume))
+		SaveAs(geom, sprintf("geomPlus%d_%.2f", size, roundness))
 		for angle = angle0; angle <= Pi/4+1e-3; angle += Pi / 128 {
 			if abs(angle-Pi/4) < 1e-3 {
 				angle = Pi / 4
@@ -51,276 +52,9 @@ for size = size0; size >= 100; size = size * 0.5 {
 		}
 	}
 }
-//Short axis: 100.000 nm
-//Long axis: 100 nm
-//Volume: 3.952e-23 m³
-//Short axis: 99.000 nm
-//Long axis: 100 nm
-//Volume: 3.920e-23 m³
-//Short axis: 98.000 nm
-//Long axis: 100 nm
-//Volume: 3.896e-23 m³
-//Short axis: 97.000 nm
-//Long axis: 100 nm
-//Volume: 3.880e-23 m³
-//Short axis: 96.000 nm
-//Long axis: 100 nm
-//Volume: 3.864e-23 m³
-//Short axis: 95.000 nm
-//Long axis: 100 nm
-//Volume: 3.864e-23 m³
-//Short axis: 94.000 nm
-//Long axis: 100 nm
-//Volume: 3.848e-23 m³
-//Short axis: 93.000 nm
-//Long axis: 100 nm
-//Volume: 3.848e-23 m³
-//Short axis: 92.000 nm
-//Long axis: 100 nm
-//Volume: 3.800e-23 m³
-//Short axis: 91.000 nm
-//Long axis: 100 nm
-//Volume: 3.800e-23 m³
-//Short axis: 90.000 nm
-//Long axis: 100 nm
-//Volume: 3.768e-23 m³
-//Short axis: 89.000 nm
-//Long axis: 100 nm
-//Volume: 3.768e-23 m³
-//Short axis: 88.000 nm
-//Long axis: 100 nm
-//Volume: 3.768e-23 m³
-//Short axis: 87.000 nm
-//Long axis: 100 nm
-//Volume: 3.712e-23 m³
-//Short axis: 86.000 nm
-//Long axis: 100 nm
-//Volume: 3.664e-23 m³
-//Short axis: 85.000 nm
-//Long axis: 100 nm
-//Volume: 3.664e-23 m³
-//Short axis: 84.000 nm
-//Long axis: 100 nm
-//Volume: 3.664e-23 m³
-//Short axis: 83.000 nm
-//Long axis: 100 nm
-//Volume: 3.664e-23 m³
-//Short axis: 82.000 nm
-//Long axis: 100 nm
-//Volume: 3.632e-23 m³
-//Short axis: 81.000 nm
-//Long axis: 100 nm
-//Volume: 3.616e-23 m³
-//Short axis: 80.000 nm
-//Long axis: 100 nm
-//Volume: 3.584e-23 m³
-//Short axis: 79.000 nm
-//Long axis: 100 nm
-//Volume: 3.560e-23 m³
-//Short axis: 78.000 nm
-//Long axis: 100 nm
-//Volume: 3.544e-23 m³
-//Short axis: 77.000 nm
-//Long axis: 100 nm
-//Volume: 3.528e-23 m³
-//Short axis: 76.000 nm
-//Long axis: 100 nm
-//Volume: 3.512e-23 m³
-//Short axis: 75.000 nm
-//Long axis: 100 nm
-//Volume: 3.496e-23 m³
-//Short axis: 74.000 nm
-//Long axis: 100 nm
-//Volume: 3.464e-23 m³
-//Short axis: 73.000 nm
-//Long axis: 100 nm
-//Volume: 3.416e-23 m³
-//Short axis: 72.000 nm
-//Long axis: 100 nm
-//Volume: 3.416e-23 m³
-//Short axis: 71.000 nm
-//Long axis: 100 nm
-//Volume: 3.392e-23 m³
-//Short axis: 70.000 nm
-//Long axis: 100 nm
-//Volume: 3.360e-23 m³
-//Short axis: 69.000 nm
-//Long axis: 100 nm
-//Volume: 3.360e-23 m³
-//Short axis: 68.000 nm
-//Long axis: 100 nm
-//Volume: 3.312e-23 m³
-//Short axis: 67.000 nm
-//Long axis: 100 nm
-//Volume: 3.296e-23 m³
 //Short axis: 66.000 nm
 //Long axis: 100 nm
-//Volume: 3.232e-23 m³
-//Short axis: 65.000 nm
-//Long axis: 100 nm
-//Volume: 3.232e-23 m³
-//Short axis: 64.000 nm
-//Long axis: 100 nm
-//Volume: 3.192e-23 m³
-//Short axis: 63.000 nm
-//Long axis: 100 nm
-//Volume: 3.176e-23 m³
-//Short axis: 62.000 nm
-//Long axis: 100 nm
-//Volume: 3.160e-23 m³
-//Short axis: 61.000 nm
-//Long axis: 100 nm
-//Volume: 3.128e-23 m³
-//Short axis: 60.000 nm
-//Long axis: 100 nm
-//Volume: 3.112e-23 m³
-//Short axis: 59.000 nm
-//Long axis: 100 nm
-//Volume: 3.064e-23 m³
-//Short axis: 58.000 nm
-//Long axis: 100 nm
-//Volume: 3.016e-23 m³
-//Short axis: 57.000 nm
-//Long axis: 100 nm
-//Volume: 3.008e-23 m³
-//Short axis: 56.000 nm
-//Long axis: 100 nm
-//Volume: 2.976e-23 m³
-//Short axis: 55.000 nm
-//Long axis: 100 nm
-//Volume: 2.960e-23 m³
-//Short axis: 54.000 nm
-//Long axis: 100 nm
-//Volume: 2.928e-23 m³
-//Short axis: 53.000 nm
-//Long axis: 100 nm
-//Volume: 2.880e-23 m³
-//Short axis: 52.000 nm
-//Long axis: 100 nm
-//Volume: 2.848e-23 m³
-//Short axis: 51.000 nm
-//Long axis: 100 nm
-//Volume: 2.824e-23 m³
-//Short axis: 50.000 nm
-//Long axis: 100 nm
-//Volume: 2.744e-23 m³
-//Short axis: 49.000 nm
-//Long axis: 100 nm
-//Volume: 2.728e-23 m³
-//Short axis: 48.000 nm
-//Long axis: 100 nm
-//Volume: 2.696e-23 m³
-//Short axis: 47.000 nm
-//Long axis: 100 nm
-//Volume: 2.648e-23 m³
-//Short axis: 46.000 nm
-//Long axis: 100 nm
-//Volume: 2.624e-23 m³
-//Short axis: 45.000 nm
-//Long axis: 100 nm
-//Volume: 2.576e-23 m³
-//Short axis: 44.000 nm
-//Long axis: 100 nm
-//Volume: 2.560e-23 m³
-//Short axis: 43.000 nm
-//Long axis: 100 nm
-//Volume: 2.512e-23 m³
-//Short axis: 42.000 nm
-//Long axis: 100 nm
-//Volume: 2.480e-23 m³
-//Short axis: 41.000 nm
-//Long axis: 100 nm
-//Volume: 2.392e-23 m³
-//Short axis: 40.000 nm
-//Long axis: 100 nm
-//Volume: 2.376e-23 m³
-//Short axis: 39.000 nm
-//Long axis: 100 nm
-//Volume: 2.344e-23 m³
-//Short axis: 38.000 nm
-//Long axis: 100 nm
-//Volume: 2.280e-23 m³
-//Short axis: 37.000 nm
-//Long axis: 100 nm
-//Volume: 2.264e-23 m³
-//Short axis: 36.000 nm
-//Long axis: 100 nm
-//Volume: 2.208e-23 m³
-//Short axis: 35.000 nm
-//Long axis: 100 nm
-//Volume: 2.160e-23 m³
-//Short axis: 34.000 nm
-//Long axis: 100 nm
-//Volume: 2.128e-23 m³
-//Short axis: 33.000 nm
-//Long axis: 100 nm
-//Volume: 2.080e-23 m³
-//Short axis: 32.000 nm
-//Long axis: 100 nm
-//Volume: 2.032e-23 m³
-//Short axis: 31.000 nm
-//Long axis: 100 nm
-//Volume: 1.976e-23 m³
-//Short axis: 30.000 nm
-//Long axis: 100 nm
-//Volume: 1.912e-23 m³
-//Short axis: 29.000 nm
-//Long axis: 100 nm
-//Volume: 1.864e-23 m³
-//Short axis: 28.000 nm
-//Long axis: 100 nm
-//Volume: 1.800e-23 m³
-//Short axis: 27.000 nm
-//Long axis: 100 nm
-//Volume: 1.736e-23 m³
-//Short axis: 26.000 nm
-//Long axis: 100 nm
-//Volume: 1.696e-23 m³
-//Short axis: 25.000 nm
-//Long axis: 100 nm
-//Volume: 1.664e-23 m³
-//Short axis: 24.000 nm
-//Long axis: 100 nm
-//Volume: 1.616e-23 m³
-//Short axis: 23.000 nm
-//Long axis: 100 nm
-//Volume: 1.552e-23 m³
-//Short axis: 22.000 nm
-//Long axis: 100 nm
-//Volume: 1.464e-23 m³
-//Short axis: 21.000 nm
-//Long axis: 100 nm
-//Volume: 1.448e-23 m³
-//Short axis: 20.000 nm
-//Long axis: 100 nm
-//Volume: 1.400e-23 m³
-//Short axis: 19.000 nm
-//Long axis: 100 nm
-//Volume: 1.320e-23 m³
-//Short axis: 18.000 nm
-//Long axis: 100 nm
-//Volume: 1.248e-23 m³
-//Short axis: 17.000 nm
-//Long axis: 100 nm
-//Volume: 1.184e-23 m³
-//Short axis: 16.000 nm
-//Long axis: 100 nm
-//Volume: 1.152e-23 m³
-//Short axis: 15.000 nm
-//Long axis: 100 nm
-//Volume: 1.088e-23 m³
-//Short axis: 14.000 nm
-//Long axis: 100 nm
-//Volume: 9.680e-24 m³
-//Short axis: 13.000 nm
-//Long axis: 100 nm
-//Volume: 9.360e-24 m³
-//Short axis: 12.000 nm
-//Long axis: 100 nm
-//Volume: 9.040e-24 m³
-//Short axis: 11.000 nm
-//Long axis: 100 nm
-//Volume: 8.240e-24 m³
+//Volume: 3.250e-23 m³
 //********************************************************************//
 //Please cite the following references, relevant for your simulation. //
 //See bibtex file in output folder for justification.                 //
