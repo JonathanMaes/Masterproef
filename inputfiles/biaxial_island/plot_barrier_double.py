@@ -39,7 +39,6 @@ def plot(filename, save=False, inset=None, groupBy=None):
     INSET = bool(inset)
     USE_ELECTRONVOLT = True
     USE_ABSOLUTE_VALUE = False
-    PLOT_AS_SCATTER = False
 
     fig = plt.figure(figsize=(8.0, 5.0))
     ax = fig.add_subplot(111)
@@ -81,14 +80,9 @@ def plot(filename, save=False, inset=None, groupBy=None):
             label = '%s nm' % size
         elif groupBy == "Cell_size":
             label = '%s nm' % (size*1e9)
-        if PLOT_AS_SCATTER:
-            plt.plot(roundnesses, E_barrier, '.', label=label)
-            if INSET:
-                axins.plot(roundnesses, E_barrier, 'o')
-        else:
-            plt.plot(roundnesses, E_barrier, '.-', label=label)
-            if INSET:
-                axins.plot(roundnesses, E_barrier, 'o')
+        plt.plot(roundnesses, E_barrier, '.-', label=label)
+        if INSET:
+            axins.plot(roundnesses, E_barrier, 'o-')
 
     plt.grid(color='grey', linestyle=':', linewidth=1)
     plt.axhline(0, color='black', linestyle=':', linewidth=1, label=None)
@@ -119,7 +113,7 @@ if __name__ == "__main__":
     # plot('biaxial_island_shape.out/tablePlus_100_0.1-1_aPi4_B0.001_cell3.125nm.txt', save=SAVE)
 
     # Those with aPi128 include the second-order anisotropy, at the cost of using a higher field.
-    plot('biaxial_island_shape.out/tablePlus_100_0.1-1_aPi128_B0.01_cell1,2,4nm.txt', save=1, groupBy="Cell_size", inset=[0.6, 0.1, 0.36, 0.37, 0.45, -0.15, 0.55, 0.15])
+    plot('biaxial_island_shape.out/tablePlus_100_0.1-1_aPi128_B0.01_cell1,2,4nm.txt', save=SAVE, groupBy="Cell_size", inset=[0.6, 0.1, 0.36, 0.37, 0.45, -0.15, 0.55, 0.15])
     # plot('biaxial_island_shape.out/tablePlus_32,64,128_0.1-1_aPi128_B0.01_cell1nm.txt', save=SAVE, groupBy="Size")
 
     # plot('biaxial_island_shape.out/table.txt', save=SAVE)

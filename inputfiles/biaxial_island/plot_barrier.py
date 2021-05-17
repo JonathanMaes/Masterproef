@@ -24,14 +24,15 @@ if __name__ == "__main__":
     # Shape anisotropy: Plus
     # shape = read_mumax3_table('biaxial_island_shape.out/tablePlus_10-100_aPi4_B0.001_l1.txt')
     shape = read_mumax3_table('biaxial_island_shape.out/tablePlus_10-100_a0-2Pi_Pi4_B0.001_l5.txt')
+    shape = read_mumax3_table('biaxial_island_shape.out/table.txt')
     E_barrier = []
     sizes = []
-    for subset in shape.groupby("Length"):
+    for subset in shape.groupby("Size"):
         size = subset[0]
         subtable = subset[1]
         E_demag = subtable["E_total"]-subtable["E_Zeeman"]
         diff = max(E_demag) - min(E_demag)
-        print("(%.2f nm) Delta E: %.2e J = %.3f eV" % (size, diff, diff/1.602e-19))
+        print("(%.2f nm) Delta E: %.2e J = %.4f eV" % (size, diff, diff/1.602e-19))
         E_barrier.append(diff)
         sizes.append(size)
         legend.append('Shape%d' % size)
