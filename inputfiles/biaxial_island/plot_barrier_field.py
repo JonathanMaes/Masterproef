@@ -30,11 +30,7 @@ if __name__ == "__main__":
     SAVE2 = False
 
     # inFileName = 'biaxial_island_shape_field.out/tablePlus_65_B25-0.001-div4_a128Pi_plotOptimized.txt'
-    # inFileName = 'biaxial_island_shape_field.out/tablePlus_48.2_B25-0.001-div4_a128Pi_plotOptimized.txt'
-    # inFileName = 'biaxial_island_shape_field.out/tablePlus_49_B100-0.001-div4_a128Pi_cell4nm.txt'
-    # inFileName = 'biaxial_island_shape_field.out/tablePlus_49_B100-0.001-div4_a128Pi_cell1nm.txt'
-    # inFileName = 'biaxial_island_shape_field.out/tablePlus_50.5_B100-0.001-div4_a128Pi_cell2nm.txt'
-    inFileName = 'biaxial_island_shape_field.out/tablePlus_30_B25-0.005-div4_a128Pi_cell1nm.txt'
+    inFileName = 'biaxial_island_shape_field.out/tablePlus_48.2_B25-0.001-div4_a128Pi_plotOptimized.txt'
     outDir1 = 'Figures/BarrierLandscape'
     if not os.path.exists(outDir1):
         os.makedirs(outDir1)
