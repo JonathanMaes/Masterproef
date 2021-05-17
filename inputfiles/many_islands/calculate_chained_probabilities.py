@@ -68,36 +68,28 @@ def plot_probabilities(halfadderfile, logicconfig=1):
     collected_magangles_output = [round_90(l, delta=geom_angles[output_island-1]) % 360 for l in collected_magangles_output]
     collected_inputs = [[halfadder_comb[int(angle//90)] for angle in l] for l in collected_magangles_input]
     collected_outputs = [[halfadder_comb[int(angle//90)] for angle in l] for l in collected_magangles_output]
-    print(collected_energies)
-    print(collected_inputs)
-    print(collected_outputs)
+    print('Energies:', collected_energies)
+    print('Inputs:  ', collected_inputs)
+    print('Outputs: ', collected_outputs)
 
     E_therm = 0.0258 # [eV]
-
-    portions = [np.exp(-line/E_therm) for line in collected_energies]
-    portions_sum = sum([np.sum(line) for line in portions])
-    # probabilities = [line/portions_sum for line in portions] # probability of (input,output) combination if all free to do what they want
-    probabilities = [line/np.sum(line) for line in portions] # probability of output IF INPUT FIXED AT THE VALUE
 
     flattened_energies = [i for line in collected_energies for i in line]
     flattened_inputs = [i for line in collected_inputs for i in line]
     flattened_outputs = [i for line in collected_outputs for i in line]
     flattened_inout = [(w, flattened_outputs[i]) for i, w in enumerate(flattened_inputs)]
-    # print(flattened_inout)
 
-    correct = [(0,0), (1,1), (2,1), (3,2)]
 
     # # plot as function of thermal energy
     # E_therms = np.arange(0, 1, 0.001)
     # portionss = np.array([[np.exp(-E/kBT) for kBT in E_therms] for E in flattened_energies])
     # probabilitiess = [[w/np.sum(portionss[:,i]) for i,w in enumerate(comb)] for comb in portionss]
+    # correct = [(0,0), (1,1), (2,1), (3,2)]
     # for i, line in enumerate(probabilitiess):
     #     plt.plot(E_therms, line, color='b' if flattened_inout[i] in correct else 'r')
     # plt.xlabel('Thermal energy [eV]')
     # plt.ylabel('Probability [eV]')
     # plt.show()
-
-    flattened_inputfixed_probs = [i for line in [line/np.sum(line) for line in portions] for i in line]
 
 
 
@@ -250,9 +242,7 @@ def plot_probabilities(halfadderfile, logicconfig=1):
                     idx = sifted_states.index(state)
                     prob = sifted_probs[idx]
                     image_array[i, j] = prob
-        # ax.set_xticklabels([4*S3+2*S2+1*S1 for S1, S2, S3 in output_combs]) # (S3S2S1 as a true number)
-        ax.set_xticklabels([4*S3+2*S2+1*S1 for S3, S2, S1 in output_combs]) # (S3S2S1 as a true number)
-        # ax.set_yticklabels(['%d+%d' % (2*A2+A1, 2*B2+B1) for A1, B1, A2, B2 in input_combs])
+        ax.set_xticklabels([4*S3+2*S2+1*S1 for S3, S2, S1 in output_combs])
         ax.set_yticklabels(['%d+%d' % (2*A2+A1, 2*B2+B1) for A2, A1, B2, B1 in input_combs])
 
         plt.scatter([0, 1, 2, 3, 1, 2, 3, 4, 2, 3, 4, 5, 3, 4, 5, 6], np.arange(16), s=9)
