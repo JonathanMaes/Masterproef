@@ -3,10 +3,10 @@
     their magnetization angles.
 */
 //// Grid
-Nx := 256
+Nx := 512
 Ny := 256
 Nz := 1
-cellSize := 2.00e-9
+cellSize := 1.00e-9
 SetGridSize(Nx, Ny, Nz)
 SetCellSize(cellSize, cellSize, 5e-9/Nz)
 Lx := cellSize*Nx
@@ -36,9 +36,9 @@ island3 := Ellipse(100.00e-9, 66.00e-9)
 island1 = island1.Add(island1.RotZ(Pi/2))
 island2 = island2.Add(island2.RotZ(Pi/2))
 island3 = island3.Add(island3.RotZ(Pi/2))
-island1 = island1.RotZ(angle1).Transl(-90.000e-9, 100.000e-9, 0)
-island2 = island2.RotZ(angle2).Transl(38.000e-9, 100.000e-9, 0)
-island3 = island3.RotZ(angle3).Transl(88.000e-9, -100.000e-9, 0)
+island1 = island1.RotZ(angle1).Transl(-129.000e-9, 25.000e-9, 0)
+island2 = island2.RotZ(angle2).Transl(-1.000e-9, 25.000e-9, 0)
+island3 = island3.RotZ(angle3).Transl(129.000e-9, -25.000e-9, 0)
 // GEOM: Here add all islands together
 geometry := island1.Add(island2).Add(island3)
 SetGeom(geometry)
@@ -75,8 +75,7 @@ TableAddVar(0.660, "roundness", "")
 TableAddVar(100.000, "size", "m")
 
 TableAddVar(cellSize, "Cell_size", "m")
-TableAddVar(-200.0, "d", "nm")
-TableAddVar(50.0, "s", "nm")
+
 
 //// Many nested loops
 // GEOM: A loop for each island that is NOT fixed

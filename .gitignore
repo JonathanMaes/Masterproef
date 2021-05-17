@@ -9,3 +9,4 @@ inputfiles/**/*.out/*
 !inputfiles/**/*.out/*.txt
 inputfiles/biaxial_island/biaxial_island_switching_extfield.out/
 inputfiles/many_islands/many_islands_interaction.out/
+inputfiles/many_islands/many_islands_interaction.mx3
