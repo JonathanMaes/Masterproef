@@ -261,8 +261,7 @@ def plot_probabilities(halfadderfile, logicconfig=1):
 
     # Rotate the tick labels and set their alignment, if necessary.
     if logicconfig in [1]:
-        plt.setp(ax.get_xticklabels(), rotation=-45, ha="right",
-                rotation_mode="anchor")
+        plt.setp(ax.get_xticklabels(), rotation=90, rotation_mode='anchor', horizontalalignment='left', verticalalignment='center')
 
     plt.gcf().tight_layout()
     plt.savefig(halfadderfile.replace('.txt', '_forward%d_probabilities_T%seV.pdf' % (logicconfig, E_therm)))
