@@ -102,7 +102,7 @@ def replace_with_dict(ar, dic):
     sidx = k.argsort()
     return v[sidx[np.searchsorted(k,ar,sorter=sidx)]]
 
-def plot_sweep(sweepfile, save=True, swap_axes=False, do=('balanced1', 'balanced2'), figsize=(10.0, 5.0), labelpads=None, show_colorbars=True, reverse_halfadder_foreground=False, useLR=False):
+def plot_sweep(sweepfile, save=True, swap_axes=False, do=('balanced1', 'balanced2'), figsize=(9.0, 5.0), fontsize=None, labelpads=None, show_colorbars=True, reverse_halfadder_foreground=False, show_side='LR', useLR=False, show_yaxis=True):
     """
         @param sweepfile [str]: The relative path to the "table(var1,var2).txt".
         @param save [bool] (True): If True, the figures are saved in pdf format.
@@ -111,14 +111,20 @@ def plot_sweep(sweepfile, save=True, swap_axes=False, do=('balanced1', 'balanced
         @param do [tuple] ('types', 'balanced1', 'balanced2'): All the actions in this tuple are plotted and shown. These actions are:
             - 'balanced1': Imshow where min_a(E_{a,1}) - max_a(E_{a,0}) is plotted (diff highest ground state with lowest first excited state).
             - 'balanced2': Imshow where max_a(E_{a,0}) - min_a(E_{a,0}) is plotted (diff highest ground state with lowest ground state).
-        @param figsize [tuple(2)] (7.0, 5.0): The dimensions of the saved figures, in inches. 
-        @param labelpads [tuple(2)] (-25, -25): Label padding of greyscale colorbars.
-        @param show_halfadder_types [bool] (True): If False, 4 inch is subtracted from the figsize width.
+        @param figsize [tuple(2)] (9.0, 5.0): The dimensions of the saved figures, in inches.
+        @param fontsize [int] (16): The font size in the figures.
+        @param labelpads [tuple(2)] (-25, -25): Label padding of greyscale colorbars. First element is for balanced1 figure, second for balanced2.
+        @param show_colorbars [bool] (True): If False, no colorbars are shown, and 3 inches are subtracted from the figsize width to accomodate for the lack fo colorbars.
         @param reverse_halfadder_foreground [bool] (False): If True, the last halfadder returned by check_if_halfadder() is plotted. If False, the first one.
+        @param show_side [str] ('LR'): If L is not in this string, then regions with input island 1 are not plotted. Similar for R and island 2.
         @param useLR [bool] (False): If True, island 1 is given the name 'L', and island 2 the name 'R'.
+        @param show_yaxis [bool] (True): If False, the y axis is not shown.
     """
+    if fontsize:
+        font = {'size':fontsize}
+        matplotlib.rc('font', **font)
     if not show_colorbars:
-        figsize = (figsize[0]-4, figsize[1])
+        figsize = (figsize[0]-3, figsize[1])
     if swap_axes:
         var1_colstart = 'var2-'
         var2_colstart = 'var1-'
@@ -151,8 +157,10 @@ def plot_sweep(sweepfile, save=True, swap_axes=False, do=('balanced1', 'balanced
     halfadder_type_grid = np.zeros_like(is_halfadder_grid) # Zero if no half adder, 1 corresponds to halfadder_types[0], 2 to halfadder_types[1], ...
     balance1_grid = np.zeros_like(is_halfadder_grid)
     balance1_grid[:] = np.nan
+    balance1_range = [1e100, -1e100]
     balance2_grid = np.zeros_like(is_halfadder_grid)
     balance2_grid[:] = np.nan
+    balance2_range = [1e100, -1e100]
     for i, subset in enumerate(table.groupby(var1_colstart + var1_name, sort=True)):
         subtable = subset[1] # Element 0 is the value of var1 in this loop
         for j, subsubset in enumerate(subtable.groupby(var2_colstart + var2_name, sort=True)):
@@ -160,6 +168,26 @@ def plot_sweep(sweepfile, save=True, swap_axes=False, do=('balanced1', 'balanced
             halfadders = check_if_halfadder(subsubtable, verbose=False)
             print(halfadders)
             if len(halfadders) != 0:
+                for halfadder in halfadders: # To determine the balancedness for all, no matter if L or R
+                    # Do everything that has to do with being a half adder or not, and the type of halfadder (which is input? angles in which order?)
+                    input_idx, output_idx, angles_i, input_bits = halfadder
+
+                    # Do everything that has to do with energies
+                    mag_angles, energies, geom_angles = process_data(subsubtable)
+                    input_island = input_idx
+                    all_energies = []
+                    largest_collection = 0
+                    for a in range(4):
+                        angle = geom_angles[input_island-1]+a*90
+                        _, collected_energies = collect_orientation(input_island, angle, mag_angles, energies, geom_angles)
+                        all_energies.append(collected_energies)
+                        largest_collection = max(largest_collection, len(collected_energies))
+                    all_energies = np.array([list(l) + [np.infty]*(largest_collection - len(l)) for l in all_energies])
+                    balance1 = np.min(all_energies[:,1]) - np.max(all_energies[:,0])
+                    balance2 = np.max(all_energies[:,0]) - np.min(all_energies[:,0])
+                    balance1_range = [min(balance1, balance1_range[0]), max(balance1, balance1_range[1])]
+                    balance2_range = [min(balance2, balance2_range[0]), max(balance2, balance2_range[1])]
+
                 # Do everything that has to do with being a half adder or not, and the type of halfadder (which is input? angles in which order?)
                 if reverse_halfadder_foreground:
                     input_idx, output_idx, angles_i, input_bits = halfadders[-1]
@@ -173,8 +201,6 @@ def plot_sweep(sweepfile, save=True, swap_axes=False, do=('balanced1', 'balanced
                 halfadder_type = (input_idx, output_idx, *input_bits)
                 if halfadder_type not in halfadder_types: # Element 3 contains which angles correspond to which number e.g. (0, 2, 1, 3)
                     halfadder_types.append(halfadder_type)
-                idx = halfadder_types.index(halfadder_type)
-                halfadder_type_grid[i][j] = idx+1
 
                 # Do everything that has to do with energies
                 mag_angles, energies, geom_angles = process_data(subsubtable)
@@ -187,8 +213,19 @@ def plot_sweep(sweepfile, save=True, swap_axes=False, do=('balanced1', 'balanced
                     all_energies.append(collected_energies)
                     largest_collection = max(largest_collection, len(collected_energies))
                 all_energies = np.array([list(l) + [np.infty]*(largest_collection - len(l)) for l in all_energies])
-                balance1_grid[i][j] = np.min(all_energies[:,1]) - np.max(all_energies[:,0])
-                balance2_grid[i][j] = np.max(all_energies[:,0]) - np.min(all_energies[:,0])
+                balance1 = np.min(all_energies[:,1]) - np.max(all_energies[:,0])
+                balance2 = np.max(all_energies[:,0]) - np.min(all_energies[:,0])
+
+                input_side = 'L' if input_idx==1 else 'R'
+                if input_side not in show_side:
+                    continue
+                # Below here, things that should only be done if there is no split
+                idx = halfadder_types.index(halfadder_type)
+                halfadder_type_grid[i][j] = idx+1
+
+                balance1_grid[i][j] = balance1
+                balance2_grid[i][j] = balance2
+    print(balance1_range)
     
     n_types = len(halfadder_types)
     # Sort the types numbering so they are not in a weird order. This only affects the behind-the-scenes numbering of the types, not the halfadders themselves.
@@ -239,7 +276,7 @@ def plot_sweep(sweepfile, save=True, swap_axes=False, do=('balanced1', 'balanced
                 cbar.ax.get_yaxis().set_ticklabels(['No half adder'] + ['In %d %s' % (tup[0], tup[2:]) for tup in halfadder_types])
         
         # balance1_range = [np.min(balance1_grid[~np.isnan(balance1_grid)]), max(0, np.max(balance1_grid[~np.isnan(balance1_grid)]))]
-        balance1_range = [np.min(balance1_grid[~np.isnan(balance1_grid)]), np.max(balance1_grid[~np.isnan(balance1_grid)])]
+        # balance1_range = [np.min(balance1_grid[~np.isnan(balance1_grid)]), np.max(balance1_grid[~np.isnan(balance1_grid)])]
         im_grey = ax.imshow(np.transpose(balance1_grid), vmin=balance1_range[0], vmax=balance1_range[1], origin='lower', interpolation='nearest', cmap=cm.get_cmap('Greys'), extent=extent)
         if show_colorbars:
             cbar_grey = fig.colorbar(im_grey, aspect=24, pad=0.02)
@@ -257,6 +294,9 @@ def plot_sweep(sweepfile, save=True, swap_axes=False, do=('balanced1', 'balanced
                 if halfadder_type == 0:
                     col = 'white'
                 else:
+                    input_side = 'L' if halfadder_types[halfadder_type-1][0]==1 else 'R'
+                    if input_side not in show_side:
+                        continue
                     col = colormaps[halfadder_type-1]((balance1_portion*darkestcolorfrac+(1-darkestcolorfrac)/2)**1.5)
 
                 rect = Rectangle((min(var1_range2[i:i+2]), min(var2_range2[j:j+2])), abs(var1_step), abs(var2_step), edgecolor='none', facecolor=col)
@@ -268,7 +308,7 @@ def plot_sweep(sweepfile, save=True, swap_axes=False, do=('balanced1', 'balanced
 
         # Grey line around the region where there is a positive balance
         contourlines_balance1 = contour_rect(balance1_grid.transpose() > 0, extent)
-        draw_contour(ax, contourlines_balance1, color='navy', alpha=1)
+        draw_contour(ax, contourlines_balance1, color='gold', alpha=1)
         
         ax.tick_params(axis='both', which='major', length=8)
         if var1_sweeped and var2_sweeped: # Stretch figure to fit pdf nicely if both vars sweeped, but keep square pixels otherwise.
@@ -283,12 +323,17 @@ def plot_sweep(sweepfile, save=True, swap_axes=False, do=('balanced1', 'balanced
             ax.set_yticks(var2_range, minor=True)
         else:
             plt.yticks([])
+        if not show_yaxis:
+            plt.yticks([])
+            plt.ylabel('')
 
         plt.gcf().subplots_adjust(bottom=0.15, left=0.15, right=0.95)
         plt.gcf().tight_layout()
         if save:
             outFilename = os.path.join(outDir, os.path.split(sweepfile)[1].replace('.txt', '_balanced1.pdf'))
-            if reverse_halfadder_foreground:
+            if show_side != 'LR':
+                outFilename = outFilename.replace('.pdf', '_%s.pdf'%show_side)
+            elif reverse_halfadder_foreground:
                 outFilename = outFilename.replace('.pdf', '_reversedForeground.pdf')
             plt.savefig(outFilename)
         plt.show()
@@ -311,7 +356,7 @@ def plot_sweep(sweepfile, save=True, swap_axes=False, do=('balanced1', 'balanced
                 cbar.ax.get_yaxis().set_ticklabels(['No half adder'] + ['In %d %s' % (tup[0], tup[2:]) for tup in halfadder_types])
         
         # balance2_range = [np.min(balance2_grid[~np.isnan(balance2_grid)]), max(0, np.max(balance2_grid[~np.isnan(balance2_grid)]))]
-        balance2_range = [np.min(balance2_grid[~np.isnan(balance2_grid)]), np.max(balance2_grid[~np.isnan(balance2_grid)])]
+        # balance2_range = [np.min(balance2_grid[~np.isnan(balance2_grid)]), np.max(balance2_grid[~np.isnan(balance2_grid)])]
         im_grey = ax.imshow(np.transpose(balance2_grid), vmin=balance2_range[0], vmax=balance2_range[1], origin='lower', interpolation='nearest', cmap=cm.get_cmap('Greys').reversed(), extent=extent)
         if show_colorbars:
             cbar_grey = fig.colorbar(im_grey, aspect=24, pad=0.02)
@@ -328,6 +373,9 @@ def plot_sweep(sweepfile, save=True, swap_axes=False, do=('balanced1', 'balanced
                 balance2_portion = (balance2 - balance2_range[0])/(balance2_range[1]-balance2_range[0])
                 if halfadder_type == 0:
                     col = 'white'
+                    input_side = 'L' if halfadder_types[halfadder_type-1][0]==1 else 'R'
+                    if input_side not in show_side:
+                        continue
                 else:
                     col = colormaps[halfadder_type-1].reversed()((balance2_portion*darkestcolorfrac+(1-darkestcolorfrac)/2)**.7)
 
@@ -351,12 +399,17 @@ def plot_sweep(sweepfile, save=True, swap_axes=False, do=('balanced1', 'balanced
             ax.set_yticks(var2_range, minor=True)
         else:
             plt.yticks([])
+        if not show_yaxis:
+            plt.ylabel('')
+            plt.yticks([])
 
         plt.gcf().subplots_adjust(bottom=0.15, left=0.15, right=0.95)
         plt.gcf().tight_layout()
         if save:
             outFilename = os.path.join(outDir, os.path.split(sweepfile)[1].replace('.txt', '_balanced2.pdf'))
-            if reverse_halfadder_foreground:
+            if show_side != 'LR':
+                outFilename = outFilename.replace('.pdf', '_%s.pdf'%show_side)
+            elif reverse_halfadder_foreground:
                 outFilename = outFilename.replace('.pdf', '_reversedForeground.pdf')
             plt.savefig(outFilename)
         plt.show()
@@ -364,13 +417,15 @@ def plot_sweep(sweepfile, save=True, swap_axes=False, do=('balanced1', 'balanced
 
 if __name__ == "__main__":
     pass
-    # plot_sweep('Results/Sweeps/Sweep_000006/table(d100-210_10,s-100-100_10).txt', swap_axes=True, do=('balanced1'), labelpads=[-35], useLR=True)
-    # plot_sweep('Results/Sweeps/Sweep_000006/table(d100-210_10,s-100-100_10).txt', swap_axes=True, do=('balanced1'), reverse_halfadder_foreground=True, show_colorbars=False)
-    # plot_sweep('Results/Sweeps/Sweep_000006/table(d100-210_10,s-100-100_10).txt', swap_axes=True, do=('balanced2'), useLR=True)
-    # plot_sweep('Results/Sweeps/Sweep_000006/table(d100-210_10,s-100-100_10).txt', swap_axes=True, do=('balanced2'), reverse_halfadder_foreground=True, show_colorbars=False)
+    # plot_sweep('Results/Sweeps/Sweep_000006/table(d100-210_10,s-100-100_10).txt', fontsize=18, swap_axes=True, do=('balanced1'), show_side='R', reverse_halfadder_foreground=True, labelpads=[-40], useLR=True, show_yaxis=False)
+    # plot_sweep('Results/Sweeps/Sweep_000006/table(d100-210_10,s-100-100_10).txt', fontsize=18, swap_axes=True, do=('balanced1'), show_side='L', show_colorbars=False)
+    # plot_sweep('Results/Sweeps/Sweep_000006/table(d100-210_10,s-100-100_10).txt', fontsize=18, swap_axes=True, do=('balanced2'), show_side='R', reverse_halfadder_foreground=True, useLR=True, show_yaxis=False)
+    # plot_sweep('Results/Sweeps/Sweep_000006/table(d100-210_10,s-100-100_10).txt', fontsize=18, swap_axes=True, do=('balanced2'), show_side='L', show_colorbars=False)
 
+    plot_sweep('Results/Sweeps/Sweep_000006/table(d100-210_10,s-100-100_10).txt', fontsize=18, swap_axes=True, do=('balanced1', 'balanced2'), labelpads=[-40,-25], useLR=True)
+    
     # plot_sweep('Results/Sweeps/Sweep_000006/table(d100-200_10,Msat3e5-15e5_1e5).txt', swap_axes=True, do=('balanced1'), labelpads=[-35], useLR=True)
     # plot_sweep('Results/Sweeps/Sweep_000006/table(d100-200_10,Msat3e5-15e5_1e5).txt', swap_axes=True, do=('balanced2'), useLR=True)
-    plot_sweep('Results/Sweeps/Sweep_000006/tableside(d0-100_5,s100-180_5).txt', swap_axes=True, useLR=True, labelpads=[-45, -32])
+    # plot_sweep('Results/Sweeps/Sweep_000006/tableside(d0-100_5,s100-180_5).txt', swap_axes=True, useLR=True, labelpads=[-45, -32])
 
     # plot_sweep('Results/Sweeps/Sweep_000006/table(d100-210_2,s20).txt', figsize=(7.0, 3.0), do=('types'))
