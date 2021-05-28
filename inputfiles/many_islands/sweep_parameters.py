@@ -102,7 +102,7 @@ def replace_with_dict(ar, dic):
     sidx = k.argsort()
     return v[sidx[np.searchsorted(k,ar,sorter=sidx)]]
 
-def plot_sweep(sweepfile, save=True, swap_axes=False, do=('balanced1', 'balanced2'), figsize=(9.0, 5.0), fontsize=None, labelpads=None, show_colorbars=True, reverse_halfadder_foreground=False, show_side='LR', useLR=False, show_yaxis=True):
+def plot_sweep(sweepfile, save=True, swap_axes=False, do=('balanced1', 'balanced2'), figsize=(9.0, 5.0), fontsize=None, labelpads=None, show_colorbars=True, reverse_halfadder_foreground=False, show_side='LR', useLR=False, show_yaxis=True, plot_dot=None):
     """
         @param sweepfile [str]: The relative path to the "table(var1,var2).txt".
         @param save [bool] (True): If True, the figures are saved in pdf format.
@@ -119,6 +119,7 @@ def plot_sweep(sweepfile, save=True, swap_axes=False, do=('balanced1', 'balanced
         @param show_side [str] ('LR'): If L is not in this string, then regions with input island 1 are not plotted. Similar for R and island 2.
         @param useLR [bool] (False): If True, island 1 is given the name 'L', and island 2 the name 'R'.
         @param show_yaxis [bool] (True): If False, the y axis is not shown.
+        @param plot_dot [tuple(2)] (None): If specified, a black dot is placed at the specified coordinates.
     """
     if fontsize:
         font = {'size':fontsize}
@@ -309,6 +310,9 @@ def plot_sweep(sweepfile, save=True, swap_axes=False, do=('balanced1', 'balanced
         # Grey line around the region where there is a positive balance
         contourlines_balance1 = contour_rect(balance1_grid.transpose() > 0, extent)
         draw_contour(ax, contourlines_balance1, color='gold', alpha=1)
+
+        if plot_dot:
+            ax.scatter(plot_dot[0], plot_dot[1], color='black', s=16, zorder=100)
         
         ax.tick_params(axis='both', which='major', length=8)
         if var1_sweeped and var2_sweeped: # Stretch figure to fit pdf nicely if both vars sweeped, but keep square pixels otherwise.
@@ -385,6 +389,9 @@ def plot_sweep(sweepfile, save=True, swap_axes=False, do=('balanced1', 'balanced
         draw_contour(ax, contourlines, color='black', alpha=1)
         ax.set_xlim([extent[0], extent[1]])
         ax.set_ylim([extent[2], extent[3]])
+
+        if plot_dot:
+            ax.scatter(plot_dot[0], plot_dot[1], color='black', s=16, zorder=100)
         
         ax.tick_params(axis='both', which='major', length=8)
         if var1_sweeped and var2_sweeped: # Stretch figure to fit pdf nicely if both vars sweeped, but keep square pixels otherwise.
@@ -417,15 +424,15 @@ def plot_sweep(sweepfile, save=True, swap_axes=False, do=('balanced1', 'balanced
 
 if __name__ == "__main__":
     pass
-    # plot_sweep('Results/Sweeps/Sweep_000006/table(d100-210_10,s-100-100_10).txt', fontsize=18, swap_axes=True, do=('balanced1'), show_side='R', reverse_halfadder_foreground=True, labelpads=[-40], useLR=True, show_yaxis=False)
-    # plot_sweep('Results/Sweeps/Sweep_000006/table(d100-210_10,s-100-100_10).txt', fontsize=18, swap_axes=True, do=('balanced1'), show_side='L', show_colorbars=False)
-    # plot_sweep('Results/Sweeps/Sweep_000006/table(d100-210_10,s-100-100_10).txt', fontsize=18, swap_axes=True, do=('balanced2'), show_side='R', reverse_halfadder_foreground=True, useLR=True, show_yaxis=False)
-    # plot_sweep('Results/Sweeps/Sweep_000006/table(d100-210_10,s-100-100_10).txt', fontsize=18, swap_axes=True, do=('balanced2'), show_side='L', show_colorbars=False)
+    # plot_sweep('Results/Sweeps/Sweep_000006/table(d100-210_10,s-100-100_10).txt', plot_dot=(-60,-170), fontsize=18, swap_axes=True, do=('balanced1'), show_side='R', reverse_halfadder_foreground=True, labelpads=[-40], useLR=True, show_yaxis=False)
+    # plot_sweep('Results/Sweeps/Sweep_000006/table(d100-210_10,s-100-100_10).txt', plot_dot=(-60,-170), fontsize=18, swap_axes=True, do=('balanced1'), show_side='L', show_colorbars=False)
+    # plot_sweep('Results/Sweeps/Sweep_000006/table(d100-210_10,s-100-100_10).txt', plot_dot=(-60,-170), fontsize=18, swap_axes=True, do=('balanced2'), show_side='R', reverse_halfadder_foreground=True, useLR=True, show_yaxis=False)
+    # plot_sweep('Results/Sweeps/Sweep_000006/table(d100-210_10,s-100-100_10).txt', plot_dot=(-60,-170), fontsize=18, swap_axes=True, do=('balanced2'), show_side='L', show_colorbars=False)
 
-    plot_sweep('Results/Sweeps/Sweep_000006/table(d100-210_10,s-100-100_10).txt', fontsize=18, swap_axes=True, do=('balanced1', 'balanced2'), labelpads=[-40,-25], useLR=True)
+    # plot_sweep('Results/Sweeps/Sweep_000006/table(d100-210_10,s-100-100_10).txt', plot_dot=(-60,-170), fontsize=18, swap_axes=True, do=('balanced1', 'balanced2'), labelpads=[-40,-25], useLR=True)
     
     # plot_sweep('Results/Sweeps/Sweep_000006/table(d100-200_10,Msat3e5-15e5_1e5).txt', swap_axes=True, do=('balanced1'), labelpads=[-35], useLR=True)
     # plot_sweep('Results/Sweeps/Sweep_000006/table(d100-200_10,Msat3e5-15e5_1e5).txt', swap_axes=True, do=('balanced2'), useLR=True)
-    # plot_sweep('Results/Sweeps/Sweep_000006/tableside(d0-100_5,s100-180_5).txt', swap_axes=True, useLR=True, labelpads=[-45, -32])
+    plot_sweep('Results/Sweeps/Sweep_000006/tableside(d0-100_5,s100-180_5).txt', plot_dot=(130,-50), swap_axes=True, useLR=True, labelpads=[-45, -32])
 
     # plot_sweep('Results/Sweeps/Sweep_000006/table(d100-210_2,s20).txt', figsize=(7.0, 3.0), do=('types'))
