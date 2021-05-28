@@ -20,7 +20,7 @@ def read_mumax3_table(filename):
     
     return table
 
-def plot(filename, save=False, inset=None, groupBy=None):
+def plot(filename, save=False, inset=None, groupBy=None, iterate_col="Roundness"):
     '''
         @param filename [str]: relative path of the mumax table
         @param save [bool] <False>: Whether or not to save the created plot.
@@ -28,6 +28,7 @@ def plot(filename, save=False, inset=None, groupBy=None):
             x0, y0, dx, dy specify the physical location and size of the inset on the larger plot, as a ratio.
             x1, y1, x2, y2 specify the range of the plot.
         @param groupBy [str]: If specified, a plot will be made for each separate value in the column named <groupBy>.
+        @param iterate_col [str] (Roundness): The name of the column of the variable that is on the x axis.
     '''
     outDir = 'Figures/Barrier'
     if not os.path.exists(outDir):
@@ -49,10 +50,11 @@ def plot(filename, save=False, inset=None, groupBy=None):
     
     for subset in shape.groupby(groupBy, sort=False):
         size = subset[0]
+        print(size)
         subtable = subset[1]
         E_barrier = []
         roundnesses = []
-        for subsubset in subtable.groupby("Roundness"):
+        for subsubset in subtable.groupby(iterate_col):
             roundness = subsubset[0]
             subsubtable = subsubset[1]
             E_demag = subsubtable["E_total"]-subsubtable["E_Zeeman"]
@@ -80,13 +82,18 @@ def plot(filename, save=False, inset=None, groupBy=None):
             label = '%s nm' % size
         elif groupBy == "Cell_size":
             label = '%s nm' % (size*1e9)
+        elif groupBy == "Roundness":
+            label = r'$\rho=%s$' % size
         plt.plot(roundnesses, E_barrier, '.-', label=label)
         if INSET:
             axins.plot(roundnesses, E_barrier, 'o-')
 
     plt.grid(color='grey', linestyle=':', linewidth=1)
     plt.axhline(0, color='black', linestyle=':', linewidth=1, label=None)
-    plt.xlabel(r'Roundness $\rho$')
+    if iterate_col == "Roundness":
+        plt.xlabel(r'Roundness $\rho$')
+    elif iterate_col == "Size":
+        plt.xlabel(r'Island size $L$ [nm]')
     plt.ylabel(r'Energy barrier [%s]' % ('eV' if USE_ELECTRONVOLT else 'J'))
     plt.legend()
 
@@ -113,8 +120,10 @@ if __name__ == "__main__":
     # plot('biaxial_island_shape.out/tablePlus_100_0.1-1_aPi4_B0.001_cell3.125nm.txt', save=SAVE)
 
     # Those with aPi128 include the second-order anisotropy, at the cost of using a higher field.
-    plot('biaxial_island_shape.out/tablePlus_100_0.1-1_aPi128_B0.01_cell1,2,4nm.txt', save=SAVE, groupBy="Cell_size", inset=[0.6, 0.1, 0.36, 0.37, 0.45, -0.15, 0.55, 0.15])
+    # plot('biaxial_island_shape.out/tablePlus_100_0.1-1_aPi128_B0.01_cell1,2,4nm.txt', save=SAVE, groupBy="Cell_size", inset=[0.6, 0.1, 0.36, 0.37, 0.45, -0.15, 0.55, 0.15])
     # plot('biaxial_island_shape.out/tablePlus_32,64,128_0.1-1_aPi128_B0.01_cell1nm.txt', save=SAVE, groupBy="Size")
+    plot('biaxial_island_shape.out/tablePlus_L100-10_rho1.0,0.65,0.4_cell1nm.txt', save=True, groupBy="Roundness", iterate_col="Size")
+    
 
     # plot('biaxial_island_shape.out/table.txt', save=SAVE)
     
