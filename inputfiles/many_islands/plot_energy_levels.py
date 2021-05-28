@@ -79,6 +79,8 @@ def plot_energy_levels(halfadderfile):
 
     ax.axhline(highest_groundstate, color='blue', linestyle='--', linewidth=1)
     ax.axhline(lowest_excitedstate, color='black', linestyle='--', linewidth=1)
+    ax.text(4.1, (highest_groundstate+lowest_excitedstate)/2, r"$B_1$", verticalalignment='center')
+    # ax.annotate(s='', xy=(4,lowest_excitedstate), xytext=(4,highest_groundstate), arrowprops=dict(arrowstyle='<->')) # Too small arrow to be visible
     
     resulting_comb = []
     for i in range(4):
