@@ -312,7 +312,8 @@ def plot_sweep(sweepfile, save=True, swap_axes=False, do=('balanced1', 'balanced
         draw_contour(ax, contourlines_balance1, color='gold', alpha=1)
 
         if plot_dot:
-            ax.scatter(plot_dot[0], plot_dot[1], color='black', s=16, zorder=100)
+            ax.scatter(plot_dot[0], plot_dot[1], color='white', s=49, zorder=100)
+            ax.scatter(plot_dot[0], plot_dot[1], color='black', s=25, zorder=100)
         
         ax.tick_params(axis='both', which='major', length=8)
         if var1_sweeped and var2_sweeped: # Stretch figure to fit pdf nicely if both vars sweeped, but keep square pixels otherwise.
@@ -391,7 +392,8 @@ def plot_sweep(sweepfile, save=True, swap_axes=False, do=('balanced1', 'balanced
         ax.set_ylim([extent[2], extent[3]])
 
         if plot_dot:
-            ax.scatter(plot_dot[0], plot_dot[1], color='black', s=16, zorder=100)
+            ax.scatter(plot_dot[0], plot_dot[1], color='white', s=49, zorder=100)
+            ax.scatter(plot_dot[0], plot_dot[1], color='black', s=25, zorder=100)
         
         ax.tick_params(axis='both', which='major', length=8)
         if var1_sweeped and var2_sweeped: # Stretch figure to fit pdf nicely if both vars sweeped, but keep square pixels otherwise.

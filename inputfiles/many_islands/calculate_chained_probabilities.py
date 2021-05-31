@@ -162,8 +162,8 @@ def plot_probabilities(halfadderfile, logicconfig=1):
         ax.set_xticklabels(output_combs)
         ax.set_yticklabels(input_combs)
                         
-        plt.scatter([0, 2, 4, 6, 4, 6, 2, 1], [0, 1, 2, 3, 4, 5, 6, 7], s=25, color='white')
-        plt.scatter([0, 2, 4, 6, 4, 6, 2, 1], [0, 1, 2, 3, 4, 5, 6, 7], s=16, color='blue')
+        plt.scatter([0, 2, 4, 6, 4, 6, 2, 1], [0, 1, 2, 3, 4, 5, 6, 7], s=49, color='white')
+        plt.scatter([0, 2, 4, 6, 4, 6, 2, 1], [0, 1, 2, 3, 4, 5, 6, 7], s=25, color='blue')
     
     
     if logicconfig == 2:
@@ -246,8 +246,8 @@ def plot_probabilities(halfadderfile, logicconfig=1):
         ax.set_xticklabels([4*S3+2*S2+1*S1 for S3, S2, S1 in output_combs])
         ax.set_yticklabels(['%d+%d' % (2*A2+A1, 2*B2+B1) for A2, A1, B2, B1 in input_combs])
 
-        plt.scatter([0, 1, 2, 3, 1, 2, 3, 4, 2, 3, 4, 5, 3, 4, 5, 6], np.arange(16), s=25, color='white')
-        plt.scatter([0, 1, 2, 3, 1, 2, 3, 4, 2, 3, 4, 5, 3, 4, 5, 6], np.arange(16), s=16, color='blue')
+        plt.scatter([0, 1, 2, 3, 1, 2, 3, 4, 2, 3, 4, 5, 3, 4, 5, 6], np.arange(16), s=49, color='white')
+        plt.scatter([0, 1, 2, 3, 1, 2, 3, 4, 2, 3, 4, 5, 3, 4, 5, 6], np.arange(16), s=25, color='blue')
     
     
     im = ax.imshow(image_array, vmin=0, cmap=cm.get_cmap('Greys'))
