@@ -149,11 +149,11 @@ def generate_mumax3_inputfile(grid, islands, rho=None, L=None, Msat=None, extra_
 
 
 if __name__ == "__main__":
-    generate_mumax3_inputfile(2, [ # Basic half adder
-        Island(-128, 0, 0),
-        Island(0, 0, 0),
-        Island(20, -180, pi/2, fixed=True)
-    ], rho=0.66, L=100)
+    # generate_mumax3_inputfile(2, [ # Basic half adder
+    #     Island(-128, 0, 0),
+    #     Island(0, 0, 0),
+    #     Island(20, -180, pi/2, fixed=True)
+    # ], rho=0.66, L=100)
     # generate_mumax3_inputfile(2, [ # Basic half adder (with long wires that dont work)
     #     Island(-128, 0, 0),
     #     Island(0, 0, 0),
@@ -175,3 +175,9 @@ if __name__ == "__main__":
     #     Island(0, -180, pi/4),
     #     Island(-180, -180, 0)
     # ], rho=0.66, L=100)
+    generate_mumax3_inputfile(2, [ # Small test for input on rhombic half adder, with fixed island
+        Island(0, 0, 0),
+        Island(90,-90, pi/4),
+        Island(180, 0, pi/4),
+        Island(300, 120, 5*pi/4, fixed=True)
+    ], rho=0.66, L=100)
