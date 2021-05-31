@@ -3,6 +3,7 @@
 Literatuur/
 LaTeX/
 Presentations/
+Feedback/
 # Exclude all .out directories, unless they contain .ovf or .txt
 inputfiles/**/*.out/*
 !inputfiles/**/*.out/*.ovf
